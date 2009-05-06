@@ -1,0 +1,15 @@
+
+
+piece base, bl_leg, bl_foot, fl_leg, fl_foot, br_leg, br_foot, fr_leg, fr_foot ;
+
+static-var gun_1;
+
+Create()
+{
+	sleep 30;
+}
+
+Killed()
+{
+	sleep 30;
+}
