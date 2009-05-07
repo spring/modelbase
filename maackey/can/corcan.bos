@@ -4,6 +4,7 @@
 
 piece base, l_leg, l_foot, l_rocket, l_pt, r_leg, r_foot, r_rocket, r_pt, turret, ram, spike;
 
+
 static-var jumping;
 
 //signal definitions
