@@ -1,9 +1,27 @@
 #include "constants.h"
 
-piece  fuselage, wingl, wingr, enginel, enginer, finl, finr, bombcent, thrustl, thrustr;
+piece  fuselage, wingl, wingr, canardl, canardr, enginel, enginer;
 
 static-var  statechg_DesiredState, statechg_StateChanging;
 
+
+activatescr()
+{
+	if( TRUE )
+	{
+		sleep 1326;
+	}
+	sleep 60;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		sleep 1326;
+	}
+	sleep 60;
+}
 
 SmokeUnit(healthpercent, sleeptime, smoketype)
 {
@@ -32,22 +50,6 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 	}
 }
 
-Go()
-{
-	turn finl to z-axis <-30> speed <50>;
-	turn finr to z-axis <30> speed <50>;
-	sleep 50;
-	return (1);
-}
-
-Stop()
-{
-	turn finl to z-axis <0> speed <80>;
-	turn finr to z-axis <0> speed <80>;
-	sleep 50;
-	return (1);
-}
-
 InitState()
 {
 	statechg_DesiredState = TRUE;
@@ -68,12 +70,12 @@ RequestState(requestedstate, currentstate)
 	{
 		if( statechg_DesiredState == 0 )
 		{
-			call-script Go();
+			call-script activatescr();
 			currentstate = 0;
 		}
 		if( statechg_DesiredState == 1 )
 		{
-			call-script Stop();
+			call-script deactivatescr();
 			currentstate = 1;
 		}
 	}
@@ -96,51 +98,50 @@ Deactivate()
 	start-script RequestState(1);
 }
 
-QueryPrimary(piecenum)
-{
-	piecenum = bombcent;
-}
-
-FireWeapon1()
-{
-	sleep 500;
-}
 Killed(severity, corpsetype)
 {
 	if( severity <= 25 )
 	{
 		corpsetype = 1;
 		explode fuselage type BITMAPONLY;
-		explode enginel type BITMAPONLY;
-		explode enginer type BITMAPONLY;
 		explode wingl type BITMAPONLY;
 		explode wingr type BITMAPONLY;
+		explode canardl type BITMAPONLY;
+		explode canardr type BITMAPONLY;
+		explode enginel type BITMAPONLY;
+		explode enginer type BITMAPONLY;
 		return (0);
 	}
 	if( severity <= 50 )
 	{
 		corpsetype = 1;
 		explode fuselage type BITMAPONLY;
-		explode enginel type FALL;
-		explode enginer type FALL;
-		explode wingl type SHATTER;
-		explode wingr type SHATTER;
+		explode canardl type SHATTER;
+		explode canardr type SHATTER;
+		explode wingl type FALL;
+		explode wingr type FALL;
+		explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
 		corpsetype = 1;
-		explode fuselage type BITMAPONLY;
-		explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
-		explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode fuselage type SHATTER | EXPLODE_ON_HIT;
+		explode canardl type SHATTER;
+		explode canardr type SHATTER;
 		explode wingl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		explode wingr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		return (0);
 	}
 	corpsetype = 1;
-	explode fuselage type BITMAPONLY | BITMAP1;
-	explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
-	explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode fuselage type BITMAPONLY;
+	explode canardl type SHATTER | EXPLODE_ON_HIT;
+	explode canardr type SHATTER | EXPLODE_ON_HIT;
 	explode wingl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 	explode wingr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 }

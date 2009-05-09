@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  body, tail, enginel, enginer, wingl, wingr;
 
@@ -30,12 +27,6 @@ StartMoving()
 StopMoving()
 {
 	signal SIG_MOVE;
-}
-
-
-SweetSpot(piecenum)
-{
-	piecenum = body;
 }
 
 Killed(severity, corpsetype)
