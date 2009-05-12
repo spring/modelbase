@@ -1,0 +1,262 @@
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece 	base, lswivel, llarm, luarm, lnanosprayer, lnano, rswivel, rlarm, ruarm, rnanosprayer, rnano,
+		lfdoor1, lfdoor2, lfdoor3, lrdoor1, lrdoor2, lrdoor3, rfdoor1, rfdoor2, rfdoor3, rrdoor1, rrdoor2, rrdoor3;
+
+static-var  spray, statechg_DesiredState, statechg_StateChanging;
+#define SMOKEPIECE1 base
+#define SIG_ACTIVATE	2
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+	{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+	}
+
+Create()
+	{
+	hide rnano;
+	hide lnano;
+	
+	turn llarm to x-axis <-35> now;
+	turn luarm to x-axis <70> now;
+	turn lnanosprayer to x-axis <54> now;
+	turn rlarm to x-axis <-35> now;
+	turn ruarm to x-axis <70> now;
+	turn rnanosprayer to x-axis <54> now;
+	
+	start-script InitState();
+	start-script SmokeUnit();
+	}
+
+SweetSpot (piecenum)
+	{
+	piecenum = base;
+	}
+
+activatescr()
+{
+	if( TRUE )
+	{
+		move lfdoor1 to z-axis [5] speed [15];
+		move rfdoor1 to z-axis [5] speed [15];
+		move lrdoor1 to z-axis [-5] speed [15];
+		move rrdoor1 to z-axis [-5] speed [15];
+		sleep 300;
+		move lfdoor2 to z-axis [4.6] speed [13.8];
+		move rfdoor2 to z-axis [4.6] speed [13.8];
+		move lrdoor2 to z-axis [-4.6] speed [13.8];
+		move rrdoor2 to z-axis [-4.6] speed [13.8];
+		sleep 300;
+		move lfdoor3 to z-axis [4.6] speed [13.8];
+		move rfdoor3 to z-axis [4.6] speed [13.8];
+		move lrdoor3 to z-axis [-4.6] speed [13.8];
+		move rrdoor3 to z-axis [-4.6] speed [13.8];
+		wait-for-move lfdoor3 along z-axis;
+		wait-for-move rfdoor3 along z-axis;
+		wait-for-move lrdoor3 along z-axis;
+		wait-for-move rrdoor3 along z-axis;
+	}
+	if( TRUE )
+	{
+		turn llarm to x-axis <0> speed <35>;
+		turn luarm to x-axis <0> speed <70>;
+		turn lnanosprayer to x-axis <45> speed <54>;
+		
+		turn rlarm to x-axis <0> speed <35>;
+		turn ruarm to x-axis <0> speed <70>;
+		turn rnanosprayer to x-axis <45> speed <54>;
+		
+		wait-for-turn llarm around x-axis;
+		wait-for-turn luarm around x-axis;
+		wait-for-turn lnanosprayer around x-axis;
+		wait-for-turn rlarm around x-axis;
+		wait-for-turn ruarm around x-axis;
+		wait-for-turn rnanosprayer around x-axis;
+	}
+	if( TRUE )
+	{
+		turn rswivel to y-axis <90> speed <90>;
+		turn lswivel to y-axis <-90> speed <90>;
+		wait-for-turn rswivel around y-axis;
+		wait-for-turn lswivel around y-axis;
+	}
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		turn rswivel to y-axis <0> speed <90>;
+		turn lswivel to y-axis <0> speed <90>;
+		wait-for-turn rswivel around y-axis;
+		wait-for-turn lswivel around y-axis;
+	}
+	if( TRUE )
+	{
+		turn llarm to x-axis <-35> speed <35>;
+		turn luarm to x-axis <70> speed <70>;
+		turn lnanosprayer to x-axis <54> speed <54>;
+		
+		turn rlarm to x-axis <-35> speed <35>;
+		turn ruarm to x-axis <70> speed <70>;
+		turn rnanosprayer to x-axis <54> speed <54>;
+		
+		wait-for-turn llarm around x-axis;
+		wait-for-turn luarm around x-axis;
+		wait-for-turn lnanosprayer around x-axis;
+		wait-for-turn rlarm around x-axis;
+		wait-for-turn ruarm around x-axis;
+		wait-for-turn rnanosprayer around x-axis;
+	}
+		if( TRUE )
+	{
+		move lfdoor3 to z-axis [0] speed [13.8];
+		move rfdoor3 to z-axis [0] speed [13.8];
+		move lrdoor3 to z-axis [0] speed [13.8];
+		move rrdoor3 to z-axis [0] speed [13.8];
+		sleep 300;
+		move lfdoor2 to z-axis [0] speed [13.8];
+		move rfdoor2 to z-axis [0] speed [13.8];
+		move lrdoor2 to z-axis [0] speed [13.8];
+		move rrdoor2 to z-axis [0] speed [13.8];
+		sleep 300;
+		move lfdoor1 to z-axis [0] speed [15];
+		move rfdoor1 to z-axis [0] speed [15];
+		move lrdoor1 to z-axis [0] speed [15];
+		move rrdoor1 to z-axis [0] speed [15];
+		wait-for-move lfdoor1 along z-axis;
+		wait-for-move rfdoor1 along z-axis;
+		wait-for-move lrdoor1 along z-axis;
+		wait-for-move rrdoor1 along z-axis;
+	}
+}
+
+OpenYard()
+{
+	set YARD_OPEN to 1;
+	while( !get YARD_OPEN )
+	{
+		set BUGGER_OFF to 1;
+		sleep 1500;
+		set YARD_OPEN to 1;
+	}
+	set BUGGER_OFF to 0;
+}
+
+CloseYard()
+{
+	set YARD_OPEN to 0;
+	while( get YARD_OPEN )
+	{
+		set BUGGER_OFF to 1;
+		sleep 1500;
+		set YARD_OPEN to 0;
+	}
+	set BUGGER_OFF to 0;
+}
+
+Go()
+{
+	call-script activatescr();
+	call-script OpenYard();
+	set INBUILDSTANCE to 1;
+}
+
+Stop()
+{
+	set INBUILDSTANCE to 0;
+	call-script CloseYard();
+	call-script deactivatescr();
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script Go();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script Stop();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+QueryNanoPiece(piecenum)
+{
+	if( spray == 0 )
+	{
+		piecenum = rnano;
+	}
+	if( spray != 0 )
+	{
+		piecenum = lnano;
+	}
+	spray = !spray;
+}
+
+Activate()
+{
+	signal SIG_ACTIVATE;
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	signal SIG_ACTIVATE;
+	set-signal-mask SIG_ACTIVATE;
+	set-signal-mask 0;
+	start-script RequestState(1);
+}
+
+QueryBuildInfo(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+
+}
