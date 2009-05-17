@@ -1,0 +1,206 @@
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, turret, barrel, flare, rfueltank1, lfueltank1, rfueltank2, lfueltank2, rfwheel, rrwheel, lfwheel, lrwheel;
+
+static-var  restore_delay, currspeed, spinspeed, bMoving;
+
+// Signal definitions
+#define SIG_AIM				2
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+		
+SpinWheels()
+{
+	while( TRUE )
+	{
+		currspeed = get CURRENT_SPEED;
+		
+		if( !bMoving )
+		{
+			stop-spin rfwheel around x-axis;
+			stop-spin rrwheel around x-axis;
+			stop-spin lfwheel around x-axis;
+			stop-spin lrwheel around x-axis;
+			sleep 30;	
+		}
+		
+		if( bMoving )
+		{
+			if( currspeed <= [0.5] )
+			{
+				spinspeed = <102>;
+				spin rfwheel around x-axis speed spinspeed;
+				spin rrwheel around x-axis speed spinspeed;
+				spin lfwheel around x-axis speed spinspeed;
+				spin lrwheel around x-axis speed spinspeed;
+				sleep 30;
+			}
+			if( [0.5] < currspeed <= [1] )
+			{
+				spinspeed = <202>;
+				spin rfwheel around x-axis speed spinspeed;
+				spin rrwheel around x-axis speed spinspeed;
+				spin lfwheel around x-axis speed spinspeed;
+				spin lrwheel around x-axis speed spinspeed;
+				sleep 30;
+			}
+			if( currspeed > [1])
+			{
+				spinspeed = currspeed / [1.1775] * <180>;
+		
+				spin rfwheel around x-axis speed spinspeed;
+				spin rrwheel around x-axis speed spinspeed;
+				spin lfwheel around x-axis speed spinspeed;
+				spin lrwheel around x-axis speed spinspeed;
+				sleep 30;
+			}
+		}
+	}
+}
+
+StartMoving()
+{
+	bMoving = 1;
+}
+
+StopMoving()
+{
+	bMoving = 0;
+}
+
+Create()
+{
+	hide flare;
+	
+	restore_delay = 3000;
+	
+	start-script SpinWheels();
+	start-script SmokeUnit();
+}
+
+RestoreAfterDelay()
+{
+	sleep restore_delay;
+	turn turret to y-axis <0.000000> speed <90>;
+	turn barrel to x-axis <0.000000> speed <50>;
+}
+
+AimPrimary(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	turn turret to y-axis heading speed <200.000000>;
+	turn barrel to x-axis <0.000000> - pitch speed <200.000000>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn barrel around x-axis;
+	start-script RestoreAfterDelay();
+	return (1);
+}
+
+FirePrimary()
+{
+	sleep 100;
+}
+
+AimFromPrimary(piecenum)
+{
+	piecenum = turret;
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = flare;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	hide flare;
+	hide flare;
+	
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode barrel type BITMAPONLY | BITMAP1;
+		explode base type BITMAPONLY | BITMAP2;
+		explode rfueltank1 type BITMAPONLY | BITMAP4;
+		explode lfueltank1 type BITMAPONLY | BITMAP4;
+		explode turret type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode barrel type FALL | BITMAP1;
+		explode base type BITMAPONLY | BITMAP2;
+		explode rfwheel type FALL | BITMAP3;
+		explode rrwheel type FALL | BITMAP3;
+		explode lfwheel type FALL | BITMAP3;
+		explode lrwheel type FALL | BITMAP3;
+		explode rfueltank1 type SHATTER | BITMAP4;
+		explode lfueltank1 type SHATTER | BITMAP4;
+		explode rfueltank2 type SHATTER | BITMAP4;
+		explode lfueltank2 type SHATTER | BITMAP4;
+		explode turret type FALL | BITMAP3;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode base type BITMAPONLY | BITMAP2;
+		explode rfwheel type FALL | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+		explode rrwheel type FALL | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+		explode lfwheel type FALL | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+		explode lrwheel type FALL | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+		explode rfueltank1 type SHATTER | BITMAP4;
+		explode lfueltank1 type SHATTER | BITMAP4;
+		explode rfueltank2 type SHATTER | BITMAP4;
+		explode lfueltank2 type SHATTER | BITMAP4;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		return (0);
+	}
+	corpsetype = 3;
+	explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode base type BITMAPONLY | BITMAP2;
+	explode rfwheel type FALL | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+	explode rrwheel type FALL | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+	explode lfwheel type FALL | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+	explode lrwheel type FALL | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+	explode rfueltank1 type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+	explode lfueltank1 type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+	explode rfueltank2 type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+	explode lfueltank2 type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+}
