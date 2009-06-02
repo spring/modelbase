@@ -1,0 +1,162 @@
+#define TAK
+
+piece base, hull, turret, crane, nano, crane_smoke1, crane_smoke2, main_smoke, wake1, wake2, wake3, wake4;
+
+#define BASE_SMOKE_PERIOD	40
+#define MIN_SMOKE_PERIOD	240
+#define SMOKEPIECE		hull
+
+#define TURRET_TURN_SPEED	<15>
+#define PITCH_SPEED			<10>
+
+#define RECOIL_LENGTH [0.1]
+#define RECOIL_SPEED [10]
+#define RECOIL_BACK_SPEED [1]
+
+#define RESTORE_PERIOD		2500
+
+#define WHEEL_ROTATION_SPEED	<180>
+
+#define SIG_MOVE			2
+#define SIG_AIM				4
+#define SIG_BUILD			8
+
+#include "exptype.h"
+#include "sfxtype.h"
+#include "damageSmoke.h"
+
+static-var					CurrentSpeed, bMoving;
+
+EmitWakes()
+{
+	set-signal-mask SIG_MOVE;
+	while( TRUE )
+	{
+		emit-sfx 2 from wake1;
+		emit-sfx 2 from wake2;
+		emit-sfx 2 from wake3;
+		emit-sfx 2 from wake4;
+		emit-sfx SFXTYPE_BLACKSMOKE from main_smoke;
+		sleep 300;
+	}
+}
+
+TurretSmoke()
+{
+	set-signal-mask SIG_BUILD;
+	emit-sfx SFXTYPE_BLACKSMOKE from crane_smoke1;
+	emit-sfx SFXTYPE_BLACKSMOKE from crane_smoke2;
+	sleep 150;
+	emit-sfx SFXTYPE_BLACKSMOKE from crane_smoke1;
+	emit-sfx SFXTYPE_BLACKSMOKE from crane_smoke2;
+	sleep 150;
+	emit-sfx SFXTYPE_BLACKSMOKE from crane_smoke1;
+	emit-sfx SFXTYPE_BLACKSMOKE from crane_smoke2;
+	sleep 150;
+	while (TRUE)		
+	{
+		emit-sfx SFXTYPE_BLACKSMOKE from crane_smoke1;
+		emit-sfx SFXTYPE_BLACKSMOKE from crane_smoke2;
+		sleep 500;
+	}
+}
+
+SoundLoop()
+{
+	while (TRUE)
+	{
+		if (bMoving)
+		{
+			play-sound("ship2", 4);
+			sleep 3000;
+		}
+		sleep 250;
+	}
+}
+
+Create()
+{
+	bMoving = FALSE;
+	turn turret to y-axis <180> now;
+	start-script DamageSmoke();
+	start-script SoundLoop();
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = hull;
+}
+
+StartMoving()
+{
+	signal SIG_MOVE;
+	bMoving = TRUE;
+	start-script EmitWakes();
+}
+
+StopMoving()
+{
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+	// We don't want this to trigger on VERY short stops
+	sleep 100;
+	bMoving = FALSE;
+}
+
+RestoreTurret()
+{
+	set-signal-mask SIG_AIM;
+	signal SIG_BUILD;
+	turn turret to y-axis <180> speed TURRET_TURN_SPEED;
+	turn crane to x-axis <0> speed PITCH_SPEED;
+	set INBUILDSTANCE to 0;
+}
+
+QueryNanoPiece(piecenum)
+{
+	piecenum=nano;
+}
+
+RotateTurretForWork(heading)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	turn turret to y-axis heading speed TURRET_TURN_SPEED;
+	turn crane to x-axis <-30> speed PITCH_SPEED;
+	wait-for-turn turret around y-axis;
+	wait-for-turn crane around x-axis;
+	set INBUILDSTANCE to 1;
+	return (TRUE);
+}
+
+StartBuilding(heading, pitch)
+{
+	start-script RotateTurretForWork(heading);
+	start-script TurretSmoke();
+}
+
+StopBuilding()
+{
+	start-script RestoreTurret();
+}
+
+TargetHeading(heading)
+{
+}
+
+Killed(severity, corpsetype)
+{
+	if (severity<50)
+	{
+		corpsetype = 1;
+		explode hull type		BITMAPONLY|BITMAP1;
+		explode turret type		BITMAPONLY|BITMAP4;
+		explode crane type		BITMAPONLY|BITMAP5;
+		return (TRUE);
+	}
+	corpsetype = 2;
+	explode hull type		SHATTER|BITMAP1;
+	explode turret type		SHATTER|BITMAP2;
+	explode crane type		FALL|SMOKE|EXPLODE_ON_HIT|BITMAP4;
+	return (TRUE);
+}
