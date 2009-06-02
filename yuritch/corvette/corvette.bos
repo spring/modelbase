@@ -1,0 +1,313 @@
+#define TAK
+
+piece base, hull, asw_turret, asw_tubes, asw_flare1, asw_flare2, asw_flare3, asw_flare4, asw_flare5, asw_flare6,
+	  sam_turret, tubes, flare1, flare2, flag1, flag2, flag3, wake1, wake2, wake3;
+
+#define BASE_SMOKE_PERIOD	40
+#define MIN_SMOKE_PERIOD	240
+
+#define SAM_TURRET_TURN_SPEED	<60>
+#define SAM_PITCH_SPEED			<30>
+
+#define ASW_TURRET_TURN_SPEED	<50>
+#define ASW_PITCH_SPEED			<25>
+
+#define HULL_LIST_SPEED		<2>
+#define HULL_LIST_ANGLE		<-5>
+
+#define MISSILE_RELOAD_TIME	10000
+#define ASW_RELOAD_TIME		20000
+
+#define FLAG_FLAP_
+
+#define RESTORE_PERIOD		25000
+
+#define SIG_MOVE			2
+#define SIG_AIM1			4
+#define SIG_AIM2			8
+
+#define FLAG_FLAP_ANGLE				<15>
+#define FLAG_FLAP_SPEED				<15>
+
+#define SMOKEPIECE	hull
+
+#include "exptype.h"
+#include "sfxtype.h"
+#include "damageSmoke.h"
+static-var					CurrentSpeed, bMoving, currentASWFlare, currentSAMFlare, isASWReady, MissilesLeft;
+
+WorkingLoop()
+{
+	while(TRUE)
+	{
+		if(bMoving)
+		{
+			//play-sound("tankgo", 4);
+			sleep 500;
+		}
+		sleep 500;
+	}
+}
+
+MissileCheck()
+{
+	while(TRUE)
+	{
+		if(MissilesLeft < 1)
+		{
+			signal SIG_AIM1;
+			turn sam_turret to y-axis <0> speed SAM_TURRET_TURN_SPEED;
+			turn tubes to x-axis <-90> speed SAM_PITCH_SPEED;
+			wait-for-turn sam_turret around y-axis;
+			wait-for-turn tubes around x-axis;
+			sleep MISSILE_RELOAD_TIME;
+			MissilesLeft = 2;
+		}
+		sleep 200;
+	}
+}
+
+FlagFlap()
+{
+	while(TRUE)
+	{
+		turn flag2 to y-axis FLAG_FLAP_ANGLE speed FLAG_FLAP_SPEED;
+		turn flag3 to y-axis (0-FLAG_FLAP_ANGLE) speed FLAG_FLAP_SPEED;
+		wait-for-turn flag2 around y-axis;
+		turn flag2 to y-axis (0-FLAG_FLAP_ANGLE) speed FLAG_FLAP_SPEED;
+		turn flag3 to y-axis FLAG_FLAP_ANGLE speed FLAG_FLAP_SPEED;
+		wait-for-turn flag2 around y-axis;
+	}
+}
+
+RearmASW()
+{
+	turn asw_turret to y-axis <0> speed ASW_TURRET_TURN_SPEED;
+	turn asw_tubes to x-axis <-90> speed ASW_PITCH_SPEED;
+	wait-for-turn asw_turret around y-axis;
+	wait-for-turn asw_tubes around x-axis;
+	sleep ASW_RELOAD_TIME;
+	isASWReady = TRUE;
+}
+
+Create()
+{
+	bMoving = FALSE;
+	start-script DamageSmoke();
+	start-script WorkingLoop();
+	currentASWFlare = 1;
+	currentSAMFlare = TRUE;
+	MissilesLeft = 2;
+	isASWReady = TRUE;
+	start-script MissileCheck();
+	while(get BUILD_PERCENT_LEFT)
+	{
+		sleep 200;
+	}
+	start-script FlagFlap();
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = hull;
+}
+
+EmitWakes()
+{
+	set-signal-mask SIG_MOVE;
+	while( TRUE )
+	{
+		emit-sfx 2 from wake1;
+		emit-sfx 2 from wake2;
+		emit-sfx 2 from wake3;
+		sleep 300;
+	}
+}
+
+StartMoving()
+{
+	signal SIG_MOVE;
+	start-script EmitWakes();
+/*	if(!bMoving)
+	{
+		play-sound("tankstart", 4);
+	}*/
+	bMoving = TRUE;
+}
+
+StopMoving()
+{
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+/*	if(bMoving)
+	{
+		play-sound("tankstop", 4);
+	}*/
+	// We don't want this to trigger on VERY short stops
+	sleep 100;
+	bMoving = FALSE;
+}
+
+RestoreTurret()
+{
+	set-signal-mask SIG_AIM1|SIG_AIM2;
+	sleep RESTORE_PERIOD;
+	turn asw_turret to y-axis <0> speed ASW_TURRET_TURN_SPEED;
+	turn asw_tubes to x-axis <0> speed ASW_PITCH_SPEED;
+	turn sam_turret to y-axis <0> speed SAM_TURRET_TURN_SPEED;
+	turn tubes to x-axis <0> speed SAM_PITCH_SPEED;
+}
+
+QueryWeapon1(piecenum)
+{
+	if(currentASWFlare == 1)
+	{
+		piecenum = asw_flare1;
+	}
+	if(currentASWFlare == 2)
+	{
+		piecenum = asw_flare2;
+	}
+	if(currentASWFlare == 3)
+	{
+		piecenum = asw_flare3;
+	}
+	if(currentASWFlare == 4)
+	{
+		piecenum = asw_flare4;
+	}
+	if(currentASWFlare == 5)
+	{
+		piecenum = asw_flare5;
+	}
+	if(currentASWFlare == 6)
+	{
+		piecenum = asw_flare6;
+	}
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = asw_turret;
+}
+
+AimWeapon1(heading, pitch)
+{
+	if(!isASWReady)
+	{
+		return FALSE;
+	}
+	signal SIG_AIM1;
+	set-signal-mask SIG_AIM1;
+	turn asw_turret to y-axis heading speed ASW_TURRET_TURN_SPEED;
+	turn asw_tubes to x-axis (0-pitch) speed ASW_PITCH_SPEED;
+	wait-for-turn asw_turret around y-axis;
+	wait-for-turn asw_tubes around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+Shot1(piecenum)
+{
+	currentASWFlare = currentASWFlare + 1;
+	if(currentASWFlare>6)
+	{
+		currentASWFlare = 1;
+	}
+	if(currentASWFlare == 1)
+	{
+		piecenum = asw_flare1;
+	}
+	if(currentASWFlare == 2)
+	{
+		piecenum = asw_flare2;
+	}
+	if(currentASWFlare == 3)
+	{
+		piecenum = asw_flare3;
+	}
+	if(currentASWFlare == 4)
+	{
+		piecenum = asw_flare4;
+	}
+	if(currentASWFlare == 5)
+	{
+		piecenum = asw_flare5;
+	}
+	if(currentASWFlare == 6)
+	{
+		piecenum = asw_flare6;
+	}
+}
+
+EndBurst1()
+{
+	isASWReady = FALSE;
+	start-script RearmASW();
+}
+
+QueryWeapon2(piecenum)
+{
+	if(currentSAMFlare)
+	{
+		piecenum = flare1;
+	} else {
+		piecenum = flare2;
+	}
+}
+
+AimFromWeapon2(piecenum)
+{
+	piecenum = sam_turret;
+}
+
+AimWeapon2(heading, pitch)
+{
+	if(missilesLeft < 1)
+	{
+		return FALSE;
+	}
+	signal SIG_AIM2;
+	set-signal-mask SIG_AIM2;
+	turn sam_turret to y-axis heading speed SAM_TURRET_TURN_SPEED;
+	turn tubes to x-axis (0-pitch) speed SAM_PITCH_SPEED;
+	wait-for-turn sam_turret around y-axis;
+	wait-for-turn tubes around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+FireWeapon2()
+{
+	currentSAMFlare = !currentSAMFlare;
+	MissilesLeft = MissilesLeft - 1;
+}
+
+SetDirection(heading)
+{
+	while (get BUILD_PERCENT_LEFT)
+	{
+		sleep 200;
+	}
+	turn flag1 to y-axis heading now;
+	return (TRUE);
+}
+
+Killed(severity, corpsetype)
+{
+	if (severity<50)
+	{
+		corpsetype = 1;
+		turn hull to x-axis HULL_LIST_ANGLE speed HULL_LIST_SPEED;
+		wait-for-turn hull around x-axis;
+		explode hull type		BITMAPONLY|BITMAP1;
+		return (TRUE);
+	}
+	corpsetype = 2;
+	explode hull type		SHATTER|BITMAP1;
+	explode asw_turret type	FALL|EXPLODE_ON_HIT|FIRE;
+	explode asw_tubes type		FALL|SMOKE|EXPLODE_ON_HIT|BITMAP4;
+	explode sam_turret type		FALL|SMOKE|EXPLODE_ON_HIT|BITMAP4;
+	explode tubes type	FALL|EXPLODE_ON_HIT|FIRE;
+	return (TRUE);
+}

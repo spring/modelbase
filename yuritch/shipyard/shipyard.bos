@@ -1,0 +1,167 @@
+#define TAK
+
+#define SILENT_UNIT
+
+#include "exptype.h"
+#include "sfxtype.h"
+
+#define SMOKE_DELAY 500
+
+#define BASE_SMOKE_PERIOD	40
+#define MIN_SMOKE_PERIOD	240
+#define SMOKEPIECE		building
+
+#define CRANE_MAX_POS		56
+#define CABIN_MAX_POS		39
+
+#define DISTANCE_UNIT		[1]
+
+#define CRANE_MOVE_SPEED	[1.5]
+#define CABIN_MOVE_SPEED	[1]
+
+piece base, building, smoke, pad, crane, cabin;
+#include "damageSmoke.h"
+static-var bIsActive, bCraneMoving;
+
+Funnels()
+{
+	while (get BUILD_PERCENT_LEFT)
+	{
+		sleep 200;
+	}
+	while(TRUE)
+	{
+		if(bIsActive)
+		{
+			emit-sfx SFXTYPE_BLACKSMOKE from smoke;
+		}
+		sleep SMOKE_DELAY;
+	}
+}
+
+CraneSound()
+{
+	while(TRUE)
+	{
+		if(bCraneMoving)
+		{
+			play-sound("highspeed_engine", 4);
+			sleep 800;
+		}
+		sleep 200;
+	}
+}
+
+CraneMovement()
+{
+	var NextCranePos, NextCabinPos;
+	while (get BUILD_PERCENT_LEFT)
+	{
+		sleep 200;
+	}
+	while(TRUE)
+	{
+		while (bIsActive)
+		{
+			NextCranePos = rand(0, CRANE_MAX_POS);
+			NextCranePos = NextCranePos * DISTANCE_UNIT;
+			move crane to z-axis (NextCranePos) speed CRANE_MOVE_SPEED;
+			NextCabinPos = rand(0, CABIN_MAX_POS);
+			NextCabinPos = NextCabinPos * DISTANCE_UNIT;
+			move cabin to x-axis (0-NextCabinPos) speed CABIN_MOVE_SPEED;
+			bCraneMoving = TRUE;
+			wait-for-move crane along z-axis;
+			wait-for-move cabin along x-axis;
+			bCraneMoving = FALSE;
+			sleep 1000;
+		}
+		sleep 250;
+	}
+}
+
+Create()
+{
+	start-script DamageSmoke();
+	start-script Funnels();
+	start-script CraneMovement();
+	start-script CraneSound();
+}
+
+OpenYard()
+{
+	set YARD_OPEN to 1;
+	while( !get YARD_OPEN )
+	{
+		set BUGGER_OFF to 1;
+		sleep 1500;
+		set YARD_OPEN to 1;
+	}
+	set BUGGER_OFF to 0;
+}
+
+CloseYard()
+{
+	set YARD_OPEN to 0;
+	while( get YARD_OPEN )
+	{
+		set BUGGER_OFF to 1;
+		sleep 1500;
+		set YARD_OPEN to 0;
+	}
+	set BUGGER_OFF to 0;
+}
+
+Activate()
+{
+	bIsActive=TRUE;
+	set ACTIVATION to 1;
+	call-script OpenYard();
+	set INBUILDSTANCE to 1;
+}
+
+Deactivate()
+{
+	bIsActive=FALSE;
+	set ACTIVATION to 0;
+	call-script CloseYard();
+}
+
+QueryNanoPiece(piecenum)
+{
+	piecenum = pad;
+}
+
+StartBuilding()
+{
+	bIsActive = TRUE;
+}
+
+StopBuilding()
+{
+	bIsActive = FALSE;
+}
+
+QueryBuildInfo(piecenum)
+{
+	piecenum = pad;
+}
+SweetSpot(piecenum)
+{
+	piecenum = building;
+}
+
+Killed(severity, corpsetype)
+{
+	if (severity<50)
+	{
+		corpsetype = 1;
+		explode building type	BITMAPONLY|BITMAP1;
+		explode crane type	BITMAPONLY|BITMAP1;
+		return (TRUE);
+	}
+	corpsetype = 2;
+	explode building type		SHATTER|BITMAP1;
+	explode crane type			FALL|SMOKE|BITMAP1;
+	explode cabin type			FALL|FIRE|BITMAP1;
+	return (TRUE);
+}

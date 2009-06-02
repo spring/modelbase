@@ -1,0 +1,852 @@
+#define TAK
+
+piece base, hull, turret_a, sleeve_a1, barrel_a1, sleeve_a2, barrel_a2, flare_a1, flare_a2,
+	  turret_b, sleeve_b1, barrel_b1, sleeve_b2, barrel_b2, flare_b1, flare_b2,
+	  turret_c, sleeve_c1, barrel_c1, sleeve_c2, barrel_c2, flare_c1, flare_c2,
+	  aa_turret1, aa_sleeve1, aa_barrel1_1, aa_flare1_1, aa_barrel1_2, aa_flare1_2,
+	  aa_turret2, aa_sleeve2, aa_barrel2_1, aa_flare2_1, aa_barrel2_2, aa_flare2_2,
+	  sam_turret1, tubes_1, sam_flare1_1, sam_flare1_2,
+	  sam_turret2, tubes_2, sam_flare2_1, sam_flare2_2,
+	  asw_turret1, asw_tubes1, asw_flare11, asw_flare12, asw_flare13, asw_flare14, asw_flare15, asw_flare16,
+	  asw_turret2, asw_tubes2, asw_flare21, asw_flare22, asw_flare23, asw_flare24, asw_flare25, asw_flare26,
+	  silo1, silo2, silo3, silo4, silo_door1, silo_door2, silo_door3, silo_door4,
+	  smoke, radar,
+	  wake1, wake2, wake3;
+
+#define BASE_SMOKE_PERIOD	40
+#define MIN_SMOKE_PERIOD	240
+#define SMOKEPIECE		hull
+
+#define MAIN_TURRET_TURN_SPEED	<10>
+#define MAIN_PITCH_SPEED		<5>
+
+#define SAM_TURRET_TURN_SPEED	<60>
+#define SAM_PITCH_SPEED			<30>
+
+#define AA_TURN_SPEED		<120>
+#define AA_PITCH_SPEED		<60>
+
+#define ASW_TURRET_TURN_SPEED	<50>
+#define ASW_PITCH_SPEED			<25>
+
+#define silo_doorTURN_SPEED	<60>
+
+#define RADAR_SPIN_SPEED	<45>
+
+#define MAX_MISSILES		4
+
+#define MISSILE_RELOAD_TIME	10000
+#define ASW_RELOAD_TIME		20000
+
+#define RECOIL_LENGTH [2]
+#define RECOIL_SPEED [10]
+#define RECOIL_BACK_SPEED [1]
+
+#define RESTORE_PERIOD		2500
+
+#define KILLED_LIST_SPEED	<1>
+#define KILLED_LIST_ANGLE	<5>
+
+#define SIG_KILL			1
+#define SIG_MOVE			2
+// turrets A, B, C
+#define SIG_AIM1			4
+#define SIG_AIM2			8
+#define SIG_AIM3			16
+// aa turrets
+#define SIG_AIM4			32
+#define SIG_AIM5			64
+// SAM turrets
+#define SIG_AIM6			128
+#define SIG_AIM7			256
+// ASW turrets
+#define SIG_AIM8			512
+#define SIG_AIM9			1024
+// AAMS
+#define SIG_AIM10			2048
+
+#include "exptype.h"
+#include "sfxtype.h"
+#include "damageSmoke.h"
+
+static-var	CurrentSpeed, bMoving, barrel_a, barrel_b, barrel_c, aa1_barrel, aa2_barrel, sam1, sam2,
+			MissilesLeft1, MissilesLeft2, isASW1Ready, isASW2Ready, AAMS_MissilesLeft, asw1, asw2, aams;
+
+WorkingLoop()
+{
+	while(TRUE)
+	{
+		if(bMoving)
+		{
+			//play-sound("tankgo", 4);
+			sleep 500;
+		}
+		sleep 500;
+	}
+}
+
+ReloadAAMSMissiles()
+{
+	while(TRUE)
+	{
+		sleep MISSILE_RELOAD_TIME;
+		if(AAMS_MissilesLeft<MAX_MISSILES)
+		{
+			++AAMS_MissilesLeft;
+		}
+	}
+}
+
+MissileCheck6()
+{
+	set-signal-mask SIG_KILL;
+	while(TRUE)
+	{
+		if(MissilesLeft1 < 1)
+		{
+			signal SIG_AIM6;
+			turn sam_turret1 to y-axis <0> speed SAM_TURRET_TURN_SPEED;
+			turn tubes_1 to x-axis <-90> speed SAM_PITCH_SPEED;
+			wait-for-turn sam_turret1 around y-axis;
+			wait-for-turn tubes_1 around x-axis;
+			sleep MISSILE_RELOAD_TIME;
+			MissilesLeft1 = 2;
+		}
+		sleep 200;
+	}
+}
+
+MissileCheck7()
+{
+	set-signal-mask SIG_KILL;
+	while(TRUE)
+	{
+		if(MissilesLeft2 < 1)
+		{
+			signal SIG_AIM7;
+			turn sam_turret2 to y-axis <0> speed SAM_TURRET_TURN_SPEED;
+			turn tubes_2 to x-axis <-90> speed SAM_PITCH_SPEED;
+			wait-for-turn sam_turret2 around y-axis;
+			wait-for-turn tubes_2 around x-axis;
+			sleep MISSILE_RELOAD_TIME;
+			MissilesLeft2 = 2;
+		}
+		sleep 200;
+	}
+}
+
+RearmASW8()
+{
+	turn asw_turret1 to y-axis <0> speed ASW_TURRET_TURN_SPEED;
+	turn asw_tubes1 to x-axis <-90> speed ASW_PITCH_SPEED;
+	wait-for-turn asw_turret1 around y-axis;
+	wait-for-turn asw_tubes1 around x-axis;
+	sleep ASW_RELOAD_TIME;
+	isASW1Ready = TRUE;
+}
+
+RearmASW9()
+{
+	turn asw_turret2 to y-axis <0> speed ASW_TURRET_TURN_SPEED;
+	turn asw_tubes2 to x-axis <-90> speed ASW_PITCH_SPEED;
+	wait-for-turn asw_turret2 around y-axis;
+	wait-for-turn asw_tubes2 around x-axis;
+	sleep ASW_RELOAD_TIME;
+	isASW2Ready = TRUE;
+}
+
+Create()
+{
+	bMoving = FALSE;
+	turn aa_turret2 to y-axis <180> now;
+	turn turret_c to y-axis <180> now;
+	turn sam_turret2 to y-axis <180> now;
+	turn asw_turret2 to y-axis <180> now;
+	barrel_a = 0;
+	barrel_b = 0;
+	barrel_c = 0;
+	aa1_barrel = 0;
+	aa2_barrel = 0;
+	sam1 = 0;
+	sam2 = 0;
+	asw1 = 0;
+	asw2 = 0;
+	aams = 1;
+	MissilesLeft1 = 2;
+	MissilesLeft2 = 2;
+	isASW1Ready = TRUE;
+	isASW2Ready = TRUE;
+	AAMS_MissilesLeft = 4;
+	start-script DamageSmoke();
+	start-script WorkingLoop();
+	start-script MissileCheck6();
+	start-script MissileCheck7();
+	start-script ReloadAAMSMissiles();
+}
+
+Activate()
+{
+	set ACTIVATION to 1;
+	spin radar around y-axis speed RADAR_SPIN_SPEED;
+}
+
+Deactivate()
+{
+	set ACTIVATION to 0;
+	stop-spin radar around y-axis;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = hull;
+}
+
+EmitWakes()
+{
+	set-signal-mask SIG_MOVE|SIG_KILL;
+	while( TRUE )
+	{
+		emit-sfx 2 from wake1;
+		emit-sfx 2 from wake2;
+		emit-sfx 2 from wake3;
+		emit-sfx SFXTYPE_BLACKSMOKE from smoke;
+		sleep 300;
+	}
+}
+
+StartMoving()
+{
+	signal SIG_MOVE;
+	start-script EmitWakes();
+	bMoving = TRUE;
+}
+
+StopMoving()
+{
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+	// We don't want this to trigger on VERY short stops
+	sleep 100;
+	bMoving = FALSE;
+}
+
+RestoreTurret()
+{
+	set-signal-mask SIG_KILL|SIG_AIM1|SIG_AIM2|SIG_AIM3|SIG_AIM4|SIG_AIM5|SIG_AIM6|SIG_AIM6|SIG_AIM7|SIG_AIM8|SIG_AIM9;
+	sleep RESTORE_PERIOD;
+	turn turret_a to y-axis <0> speed MAIN_TURRET_TURN_SPEED;
+	turn sleeve_a1 to x-axis <0> speed MAIN_PITCH_SPEED;
+	turn sleeve_a2 to x-axis <0> speed MAIN_PITCH_SPEED;
+	
+	turn turret_b to y-axis <0> speed MAIN_TURRET_TURN_SPEED;
+	turn sleeve_b1 to x-axis <0> speed MAIN_PITCH_SPEED;
+	turn sleeve_b2 to x-axis <0> speed MAIN_PITCH_SPEED;
+
+	turn turret_c to y-axis <180> speed MAIN_TURRET_TURN_SPEED;
+	turn sleeve_c1 to x-axis <0> speed MAIN_PITCH_SPEED;
+	turn sleeve_c2 to x-axis <0> speed MAIN_PITCH_SPEED;
+
+	turn aa_turret1 to y-axis <0> speed AA_TURN_SPEED;
+	turn aa_sleeve1 to x-axis <0> speed AA_PITCH_SPEED;
+	turn aa_turret2 to y-axis <180> speed AA_TURN_SPEED;
+	turn aa_sleeve2 to x-axis <0> speed AA_PITCH_SPEED;
+
+	turn sam_turret1 to y-axis <0> speed SAM_TURRET_TURN_SPEED;
+	turn tubes_1 to x-axis <0> speed SAM_PITCH_SPEED;
+	turn sam_turret2 to y-axis <180> speed SAM_TURRET_TURN_SPEED;
+	turn tubes_2 to x-axis <0> speed SAM_PITCH_SPEED;
+
+	turn asw_turret1 to y-axis <0> speed ASW_TURRET_TURN_SPEED;
+	turn asw_tubes1 to x-axis <0> speed ASW_PITCH_SPEED;
+	turn asw_turret2 to y-axis <180> speed ASW_TURRET_TURN_SPEED;
+	turn asw_tubes2 to x-axis <0> speed ASW_PITCH_SPEED;
+}
+
+QueryWeapon1(piecenum)
+{
+	if (barrel_a)
+	{
+		piecenum = flare_a1;
+	}
+	else
+	{
+		piecenum = flare_a2;
+	}
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = turret_a;
+}
+
+AimWeapon1(heading, pitch)
+{
+	signal SIG_AIM1;
+	set-signal-mask SIG_KILL|SIG_AIM1;
+	turn turret_a to y-axis heading speed MAIN_TURRET_TURN_SPEED;
+	turn sleeve_a1 to x-axis (0-pitch) speed MAIN_PITCH_SPEED;
+	turn sleeve_a2 to x-axis (0-pitch) speed MAIN_PITCH_SPEED;
+	wait-for-turn turret_a around y-axis;
+	wait-for-turn sleeve_a1 around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+FireWeapon1()
+{
+	if (barrel_a)
+	{
+		show flare_a1;
+		move barrel_a1 to z-axis (0-RECOIL_LENGTH) speed RECOIL_SPEED;
+		sleep 200;
+		move barrel_a1 to z-axis [0] speed RECOIL_BACK_SPEED;
+		hide flare_a1;
+	}
+	else
+	{
+		show flare_a2;
+		move barrel_a2 to z-axis (0-RECOIL_LENGTH) speed RECOIL_SPEED;
+		sleep 200;
+		move barrel_a2 to z-axis [0] speed RECOIL_BACK_SPEED;
+		hide flare_a2;
+	}
+	barrel_a = !barrel_a;
+}
+
+QueryWeapon2(piecenum)
+{
+	if (barrel_b)
+	{
+		piecenum = flare_b1;
+	}
+	else
+	{
+		piecenum = flare_b2;
+	}
+}
+
+AimFromWeapon2(piecenum)
+{
+	piecenum = turret_b;
+}
+
+AimWeapon2(heading, pitch)
+{
+	signal SIG_AIM2;
+	set-signal-mask SIG_KILL|SIG_AIM2;
+	turn turret_b to y-axis heading speed MAIN_TURRET_TURN_SPEED;
+	turn sleeve_b1 to x-axis (0-pitch) speed MAIN_PITCH_SPEED;
+	turn sleeve_b2 to x-axis (0-pitch) speed MAIN_PITCH_SPEED;
+	wait-for-turn turret_b around y-axis;
+	wait-for-turn sleeve_b1 around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+FireWeapon2()
+{
+	if (barrel_b)
+	{
+		show flare_b1;
+		move barrel_b1 to z-axis (0-RECOIL_LENGTH) speed RECOIL_SPEED;
+		sleep 200;
+		move barrel_b1 to z-axis [0] speed RECOIL_BACK_SPEED;
+		hide flare_b1;
+	}
+	else
+	{
+		show flare_b2;
+		move barrel_b2 to z-axis (0-RECOIL_LENGTH) speed RECOIL_SPEED;
+		sleep 200;
+		move barrel_b2 to z-axis [0] speed RECOIL_BACK_SPEED;
+		hide flare_b2;
+	}
+	barrel_b = !barrel_b;
+}
+
+QueryWeapon3(piecenum)
+{
+	if (barrel_c)
+	{
+		piecenum = flare_c1;
+	}
+	else
+	{
+		piecenum = flare_c2;
+	}
+}
+
+AimFromWeapon3(piecenum)
+{
+	piecenum = turret_c;
+}
+
+AimWeapon3(heading, pitch)
+{
+	signal SIG_AIM3;
+	set-signal-mask SIG_KILL|SIG_AIM3;
+	turn turret_c to y-axis heading speed MAIN_TURRET_TURN_SPEED;
+	turn sleeve_c1 to x-axis (0-pitch) speed MAIN_PITCH_SPEED;
+	turn sleeve_c2 to x-axis (0-pitch) speed MAIN_PITCH_SPEED;
+	wait-for-turn turret_c around y-axis;
+	wait-for-turn sleeve_c1 around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+FireWeapon3()
+{
+	if (barrel_c)
+	{
+		show flare_c1;
+		move barrel_c1 to z-axis (0-RECOIL_LENGTH) speed RECOIL_SPEED;
+		sleep 200;
+		move barrel_c1 to z-axis [0] speed RECOIL_BACK_SPEED;
+		hide flare_c1;
+	}
+	else
+	{
+		show flare_c2;
+		move barrel_c2 to z-axis (0-RECOIL_LENGTH) speed RECOIL_SPEED;
+		sleep 200;
+		move barrel_c2 to z-axis [0] speed RECOIL_BACK_SPEED;
+		hide flare_c2;
+	}
+	barrel_c = !barrel_c;
+}
+
+QueryWeapon4(piecenum)
+{
+	if (aa1_barrel)
+	{
+		piecenum = aa_flare1_1;
+	}
+	else
+	{
+		piecenum = aa_flare1_2;
+	}
+}
+
+AimFromWeapon4(piecenum)
+{
+	piecenum = aa_turret1;
+}
+
+AimWeapon4(heading, pitch)
+{
+	signal SIG_AIM4;
+	set-signal-mask SIG_AIM4|SIG_KILL;
+	turn aa_turret1 to y-axis heading speed AA_TURN_SPEED;
+	turn aa_sleeve1 to x-axis (0-pitch) speed AA_PITCH_SPEED;
+	wait-for-turn aa_turret1 around y-axis;
+	wait-for-turn aa_sleeve1 around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+FireWeapon4()
+{
+	if (aa1_barrel)
+	{
+		show aa_flare1_1;
+		sleep 200;
+		hide aa_flare1_1;
+	}
+	else
+	{
+		show aa_flare1_2;
+		sleep 200;
+		hide aa_flare1_2;
+	}
+	aa1_barrel = !aa1_barrel;
+}
+
+QueryWeapon5(piecenum)
+{
+	if (aa2_barrel)
+	{
+		piecenum = aa_flare2_1;
+	}
+	else
+	{
+		piecenum = aa_flare2_2;
+	}
+}
+
+AimFromWeapon5(piecenum)
+{
+	piecenum = aa_turret2;
+}
+
+AimWeapon5(heading, pitch)
+{
+	signal SIG_AIM5;
+	set-signal-mask SIG_AIM5|SIG_KILL;
+	turn aa_turret2 to y-axis heading speed AA_TURN_SPEED;
+	turn aa_sleeve2 to x-axis (0-pitch) speed AA_PITCH_SPEED;
+	wait-for-turn aa_turret2 around y-axis;
+	wait-for-turn aa_sleeve2 around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+FireWeapon5()
+{
+	if (aa2_barrel)
+	{
+		show aa_flare2_1;
+		sleep 200;
+		hide aa_flare2_1;
+	}
+	else
+	{
+		show aa_flare2_2;
+		sleep 200;
+		hide aa_flare2_2;
+	}
+	aa2_barrel = !aa1_barrel;
+}
+
+QueryWeapon6(piecenum)
+{
+	if(sam1)
+	{
+		piecenum = sam_flare1_1;
+	} else {
+		piecenum = sam_flare1_2;
+	}
+}
+
+AimFromWeapon6(piecenum)
+{
+	piecenum = sam_turret1;
+}
+
+AimWeapon6(heading, pitch)
+{
+	if(missilesLeft1 < 1)
+	{
+		return FALSE;
+	}
+	signal SIG_AIM6;
+	set-signal-mask SIG_KILL|SIG_AIM6;
+	turn sam_turret1 to y-axis heading speed SAM_TURRET_TURN_SPEED;
+	turn tubes_1 to x-axis (0-pitch) speed SAM_PITCH_SPEED;
+	wait-for-turn sam_turret1 around y-axis;
+	wait-for-turn tubes_1 around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+FireWeapon6()
+{
+	sam1 = !sam1;
+	MissilesLeft1 = MissilesLeft1 - 1;
+}
+
+QueryWeapon7(piecenum)
+{
+	if(sam2)
+	{
+		piecenum = sam_flare2_1;
+	} else {
+		piecenum = sam_flare2_2;
+	}
+}
+
+AimFromWeapon7(piecenum)
+{
+	piecenum = sam_turret2;
+}
+
+AimWeapon7(heading, pitch)
+{
+	if(missilesLeft2 < 1)
+	{
+		return FALSE;
+	}
+	signal SIG_AIM7;
+	set-signal-mask SIG_KILL|SIG_AIM7;
+	turn sam_turret2 to y-axis heading speed SAM_TURRET_TURN_SPEED;
+	turn tubes_2 to x-axis (0-pitch) speed SAM_PITCH_SPEED;
+	wait-for-turn sam_turret2 around y-axis;
+	wait-for-turn tubes_2 around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+FireWeapon7()
+{
+	sam2 = !sam2;
+	MissilesLeft2 = MissilesLeft2 - 1;
+}
+
+QueryWeapon8(piecenum)
+{
+	if(asw1 == 1)
+	{
+		piecenum = asw_flare11;
+	}
+	if(asw1 == 2)
+	{
+		piecenum = asw_flare12;
+	}
+	if(asw1 == 3)
+	{
+		piecenum = asw_flare13;
+	}
+	if(asw1 == 4)
+	{
+		piecenum = asw_flare14;
+	}
+	if(asw1 == 5)
+	{
+		piecenum = asw_flare15;
+	}
+	if(asw1 == 6)
+	{
+		piecenum = asw_flare16;
+	}
+}
+
+AimFromWeapon8(piecenum)
+{
+	piecenum = asw_turret1;
+}
+
+AimWeapon8(heading, pitch)
+{
+	if(!isASW1Ready)
+	{
+		return FALSE;
+	}
+	signal SIG_AIM8;
+	set-signal-mask SIG_KILL|SIG_AIM8;
+	turn asw_turret1 to y-axis heading speed ASW_TURRET_TURN_SPEED;
+	turn asw_tubes1 to x-axis (0-pitch) speed ASW_PITCH_SPEED;
+	wait-for-turn asw_turret1 around y-axis;
+	wait-for-turn asw_tubes1 around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+Shot8(piecenum)
+{
+	asw1 = asw1 + 1;
+	if(asw1 == 1)
+	{
+		piecenum = asw_flare11;
+	}
+	if(asw1 == 2)
+	{
+		piecenum = asw_flare12;
+	}
+	if(asw1 == 3)
+	{
+		piecenum = asw_flare13;
+	}
+	if(asw1 == 4)
+	{
+		piecenum = asw_flare14;
+	}
+	if(asw1 == 5)
+	{
+		piecenum = asw_flare15;
+	}
+	if(asw1 == 6)
+	{
+		piecenum = asw_flare16;
+	}
+}
+
+EndBurst8()
+{
+	isASW1Ready = FALSE;
+	start-script RearmASW8();
+}
+
+QueryWeapon9(piecenum)
+{
+	if(asw2 == 1)
+	{
+		piecenum = asw_flare21;
+	}
+	if(asw2 == 2)
+	{
+		piecenum = asw_flare22;
+	}
+	if(asw2 == 3)
+	{
+		piecenum = asw_flare23;
+	}
+	if(asw2 == 4)
+	{
+		piecenum = asw_flare24;
+	}
+	if(asw2 == 5)
+	{
+		piecenum = asw_flare25;
+	}
+	if(asw2 == 6)
+	{
+		piecenum = asw_flare26;
+	}
+}
+
+AimFromWeapon9(piecenum)
+{
+	piecenum = asw_turret2;
+}
+
+AimWeapon9(heading, pitch)
+{
+	if(!isASW2Ready)
+	{
+		return FALSE;
+	}
+	signal SIG_AIM9;
+	set-signal-mask SIG_KILL|SIG_AIM9;
+	turn asw_turret2 to y-axis heading speed ASW_TURRET_TURN_SPEED;
+	turn asw_tubes2 to x-axis (0-pitch) speed ASW_PITCH_SPEED;
+	wait-for-turn asw_turret2 around y-axis;
+	wait-for-turn asw_tubes2 around x-axis;
+	start-script RestoreTurret();
+	return (TRUE);
+}
+
+Shot9(piecenum)
+{
+	asw2 = asw2 + 1;
+	if(asw2 == 1)
+	{
+		piecenum = asw_flare21;
+	}
+	if(asw2 == 2)
+	{
+		piecenum = asw_flare22;
+	}
+	if(asw2 == 3)
+	{
+		piecenum = asw_flare23;
+	}
+	if(asw2 == 4)
+	{
+		piecenum = asw_flare24;
+	}
+	if(asw2 == 5)
+	{
+		piecenum = asw_flare25;
+	}
+	if(asw2 == 6)
+	{
+		piecenum = asw_flare26;
+	}
+}
+
+EndBurst9()
+{
+	isASW2Ready = FALSE;
+	start-script RearmASW9();
+}
+
+Restore10()
+{
+	set-signal-mask SIG_KILL|SIG_AIM10;
+
+	sleep RESTORE_PERIOD;
+
+	turn silo_door1 to z-axis <0> speed silo_doorTURN_SPEED;
+	turn silo_door2 to z-axis <0> speed silo_doorTURN_SPEED;
+	turn silo_door3 to z-axis <0> speed silo_doorTURN_SPEED;
+	turn silo_door4 to z-axis <0> speed silo_doorTURN_SPEED;
+
+	return TRUE;
+}
+
+QueryWeapon10(piecenum)
+{
+	if (aams == 1)
+	{
+		piecenum = silo1;
+	}
+	if (aams == 2)
+	{
+		piecenum = silo2;
+	}
+	if (aams == 3)
+	{
+		piecenum = silo3;
+	}
+	if (aams == 4)
+	{
+		piecenum = silo4;
+	}
+}
+
+AimFromWeapon10(piecenum)
+{
+	if (aams == 1)
+	{
+		piecenum = silo1;
+	}
+	if (aams == 2)
+	{
+		piecenum = silo2;
+	}
+	if (aams == 3)
+	{
+		piecenum = silo3;
+	}
+	if (aams == 4)
+	{
+		piecenum = silo4;
+	}
+}
+
+AimWeapon10(heading, pitch)
+{
+	signal SIG_AIM10;
+	set-signal-mask SIG_KILL|SIG_AIM10;
+	turn silo_door1 to z-axis <90> speed silo_doorTURN_SPEED;
+	turn silo_door2 to z-axis <-90> speed silo_doorTURN_SPEED;
+	turn silo_door3 to z-axis <90> speed silo_doorTURN_SPEED;
+	turn silo_door4 to z-axis <-90> speed silo_doorTURN_SPEED;
+	wait-for-turn silo_door1 around z-axis;
+	while(AAMS_MissilesLeft == 0)
+	{
+		sleep 250;
+	}
+	start-script Restore10();
+	return (TRUE);
+}
+
+FireWeapon10()
+{
+	++aams;
+	if (aams>4)
+	{
+		aams = 1;
+	}
+}
+
+Killed(severity, corpsetype)
+{
+	signal SIG_KILL;
+	if (severity<50)
+	{
+		corpsetype = 1;
+		turn hull to x-axis KILLED_LIST_ANGLE speed KILLED_LIST_SPEED;
+		turn base to z-axis KILLED_LIST_ANGLE speed KILLED_LIST_SPEED;
+		wait-for-turn hull around x-axis;
+		explode hull type		BITMAPONLY|BITMAP1;
+		return (1);
+	}
+	corpsetype = 2;
+	explode hull type			SHATTER|BITMAP1;
+	explode turret_a type	FALL|EXPLODE_ON_HIT|FIRE;
+	explode turret_b type	FALL|EXPLODE_ON_HIT|FIRE;
+	explode turret_c type	FALL|EXPLODE_ON_HIT|FIRE;
+	explode aa_turret1 type		FALL|EXPLODE_ON_HIT|FIRE;
+	explode aa_turret2 type		FALL|EXPLODE_ON_HIT|FIRE;
+	return (2);
+}
