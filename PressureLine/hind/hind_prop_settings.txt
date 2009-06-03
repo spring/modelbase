@@ -1,0 +1,14 @@
+//copy this info into your unit .fbi/.lua.
+//gfx_props_PL.lua can support up to 4 propellers.
+//thanks to the Spring 1944 team for developing the initial version, and providing the textures.
+
+	[customParams]
+	{
+		hasprops = 1;
+		prop1pos = mainblur;			//position of prop
+		prop1size = 20;				//radius of prop #1
+		prop1tex = bitmaps/proptex/prop4.tga;	//texture of prop #1
+		prop2pos = tailblur;
+		prop2size = 2.45;
+		prop2tex = bitmaps/proptex/prop4.tga;
+	}
