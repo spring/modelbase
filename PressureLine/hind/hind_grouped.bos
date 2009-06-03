@@ -1,0 +1,211 @@
+//linear constant 65536
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece	base, rengine, rjet, lengine, ljet, rbarrel, rflare, lbarrel, lflare,
+		mainhub, mainrotor, mainblur, tailhub, tailrotor, tailblur;
+
+static-var gun1, statechg_DesiredState, statechg_StateChanging;
+
+activatescr()
+{
+	if( TRUE )
+	{
+		spin mainhub around y-axis speed <360> accelerate <360>;
+		spin tailhub around x-axis speed <360> accelerate <360>;
+		sleep 1000;
+	}
+	
+	if( TRUE )
+	{
+		hide mainrotor;
+		hide tailrotor;
+		set 1024 to 1;
+		sleep 30;
+	}
+	
+	sleep 30;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+	sleep 3000;
+	}
+	
+	if( TRUE )
+	{
+		spin mainhub around y-axis speed <180> accelerate <1>;
+		spin tailhub around x-axis speed <180> accelerate <1>;
+		set 1024 to 0;
+		show mainrotor;
+		show tailrotor;
+		sleep 30;
+	}
+	
+	sleep 30;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{	
+	turn mainblur to x-axis <90> now;
+	turn tailblur to y-axis <90> now;
+
+	turn mainhub to y-axis <45> now;
+	turn tailhub to x-axis <45> now;
+
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = rflare;
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = base;
+}
+
+QueryWeapon2(piecenum)
+{
+	piecenum = lflare;
+}
+
+AimFromWeapon2(piecenum)
+{
+	piecenum = base;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+MoveRate0()
+{
+	turn base to x-axis <0> speed <30>;
+}
+
+MoveRate1()
+{
+	turn base to x-axis <0> speed <30>;
+}
+
+MoveRate2()
+{
+	turn base to x-axis <15> speed <15>;
+}
+
+Killed(severity, corpsetype)
+{
+	set 1024 to 0;
+	
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode rengine type BITMAPONLY | BITMAP5;
+		explode lengine type BITMAPONLY | BITMAP1;
+		explode tailhub type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode rengine type FALL | BITMAP2;
+		explode lengine type FALL | BITMAP3;
+		explode mainrotor type SHATTER | BITMAP1;
+		explode mainhub type SHATTER | BITMAP1;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode base type BITMAPONLY | BITMAP1;
+		explode rengine type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode lengine type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode mainrotor type SHATTER | BITMAP1;
+		explode mainrotor type SHATTER | BITMAP1;
+		return (0);
+	}
+	corpsetype = 3;
+	explode base type BITMAPONLY | BITMAP1;
+	explode rengine type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode lengine type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode mainrotor type SHATTER | BITMAP1;
+	explode mainhub type SHATTER | BITMAP1;
+}
