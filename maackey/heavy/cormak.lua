@@ -1,11 +1,11 @@
 -- $Id$
 unitDef = {
   unitname            = [[cormak]],
-  name                = [[Outlaw]],
+  name                = [[Mackinator]],
   description         = [[Riot Bot]],
-  acceleration        = 0.099874,
+  acceleration        = 0.1,
   bmcode              = [[1]],
-  brakeRate           = 0.12366,
+  brakeRate           = 0.13,
   buildCostEnergy     = 250,
   buildCostMetal      = 250,
   builder             = false,
@@ -22,9 +22,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Robot ?meurier]],
     description_pt = [[Robô dispersador]],
-    helptext       = [[The Outlaw's job is simple: destroy anything that crosses its way. Its cannon, adapted from the Leveler, shoots high speed, explosive projectiles that can fling away any small unit that isn't instantly killed. Victims who still won't die are then shot again with the A.K. class secondary weapon. Keep the Outlaw away from units that can out-range it: the heavy load of weapons and ammo it needs to carry make it slow, and somewhat unstable.]],
-    helptext_fr    = [[Le Outlow est l'?meutier par excellence. Son canon principal adapt? du Leveler tire des projectiles ? haute v?locit? projetant les ennemis en arri?re et infligeant de gros d?g?ts. Son deuxi?me canon est une adaptation du canon AK qui lui permet d'achever ses cibles rapidement. Son blindage et son armement en font une unit? solide mais lente et dont la port?e est le principal d?faut.]],
-    helptext_pt    = [[O trabalho do Outlaw é simples: Destruir tudo que atravessar seu caminho. Seu canh?o atira projéteis rápidos e explosivos que podem lançar longe qualquer unidade pequena que n?o morra na hora. Vítimas que n?o morrem s?o ent?o atingidas por sua arma secundária, uma metralhadora a laser. Mantenha-o longe de unidades que superam seu alcançe, pois ele é lento e um pouco instável.]],
+    helptext       = [[The Mackinator's job is simple: destroy anything that crosses its way. Its cannon, adapted from the Leveler, shoots high speed, explosive projectiles that can fling away any small unit that isn't instantly killed. Victims who still won't die are then shot again with the A.K. class secondary weapon. Keep the Mackinator away from units that can out-range it: the heavy load of weapons and ammo it needs to carry make it slow, and somewhat unstable.]],
+    helptext_fr    = [[Le Mackinator est l'?meutier par excellence. Son canon principal adapt? du Leveler tire des projectiles ? haute v?locit? projetant les ennemis en arri?re et infligeant de gros d?g?ts. Son deuxi?me canon est une adaptation du canon AK qui lui permet d'achever ses cibles rapidement. Son blindage et son armement en font une unit? solide mais lente et dont la port?e est le principal d?faut.]],
+    helptext_pt    = [[O trabalho do Mackinator é simples: Destruir tudo que atravessar seu caminho. Seu canh?o atira projéteis rápidos e explosivos que podem lançar longe qualquer unidade pequena que n?o morra na hora. Vítimas que n?o morrem s?o ent?o atingidas por sua arma secundária, uma metralhadora a laser. Mantenha-o longe de unidades que superam seu alcançe, pois ele é lento e um pouco instável.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -230,7 +230,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Outlaw]],
+      description      = [[Wreckage - Mackinator]],
       blocking         = true,
       catagory         = [[corcorpses]],
       damage           = 2200,
@@ -250,7 +250,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Outlaw]],
+      description      = [[Debris - Mackinator]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2200,
@@ -269,7 +269,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Outlaw]],
+      description      = [[Debris - Mackinator]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2200,
