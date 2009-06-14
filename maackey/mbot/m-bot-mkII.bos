@@ -1,7 +1,0 @@
-// by Chris Mackey
-
-piece base, head, l_gun, l_gun_barr, r_gun, r_gun_barr, 
-l_thigh, l_leg, l_foot, l_pump,
-r_thigh, r_leg, r_foot, r_pump; 
-
-SweetSpot(s){s = base;}
