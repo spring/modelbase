@@ -1,0 +1,17 @@
+//Lightpole Script (or a copy)
+
+piece base;
+
+#define SHATTER			1
+#define BITMAP_WORLDBUILDER		10000001
+
+Create()
+{
+	sleep 30;
+}
+
+Killed(a,b)
+{
+	explode base type SHATTER | BITMAP_WORLDBUILDER;
+	return (0);
+}

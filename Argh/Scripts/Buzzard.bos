@@ -1,0 +1,57 @@
+// Argh's SeaGull Script
+
+// This script is hereby released under GPL v. 2 or later by Wolfe Games, 2007
+// All contents were created by Wolfe Games.
+
+piece base, head, tail, rwing, lwing;
+
+Flap()
+{
+	var RandomWait, RandomFlaps;
+	while(TRUE)
+	{
+		RandomWait = rand (6000,15000);
+		RandomFlaps = rand (10,20);
+		While(RandomFlaps > 0)
+		{
+			turn rwing to z-axis <-30> speed <240>;
+			turn lwing to z-axis <30> speed <240>;
+			sleep 125;
+			turn rwing to z-axis <30> speed <240>;
+			turn lwing to z-axis <-30> speed <240>;
+			sleep 250;
+			turn rwing to z-axis <0> speed <240>;
+			turn lwing to z-axis <0> speed <240>;
+			sleep 125;			
+			--RandomFlaps;
+		}
+		sleep RandomWait;
+	}	
+}
+
+Noise()
+{
+	while(TRUE)
+	{
+		var RandomWait, RandomChance;
+		RandomWait = rand (10000,20000);
+		RandomChance = rand (1,6);			
+		if (RandomChance >= 5)
+		{
+			play-sound("buzzard1",10);
+		}
+		sleep RandomWait;
+	}
+}
+
+Create()
+{
+	start-script Flap();
+	start-script Noise();
+}
+
+Killed()
+{
+	return (0);
+}
+

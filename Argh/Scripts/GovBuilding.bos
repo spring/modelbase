@@ -1,0 +1,44 @@
+// Argh's GovBuilding Script
+
+// This script is released under the GPL, v. 2 or later, by Wolfe Games, 2007
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+#include "BUILDING_INCLUDES.h"
+
+piece base;
+piece explodepoint;
+
+// SmokeUnit_WORLDBUILDER is a completely optional Include.  It *requires* STANDARD_COMMANDS_WORLDBUILDER.h
+// ...to be included (or the code) *BEFORE* you call it.
+// And SMOKEPIECE1 through SMOKEPIECE4 MUST BE DEFINED!
+// It doesn't matter if they all refer to the same part.
+#define SMOKEPIECE1 base
+#define SMOKEPIECE2 base
+#define SMOKEPIECE3 base
+#define SMOKEPIECE4 base
+#include "SmokeUnit_WORLDBUILDER.h"
+
+#define DEADBUILDING_DUST_FX 1024+1
+
+Create()
+{
+	turn explodepoint to x-axis <-90> now;
+	start-script SmokeUnit_WORLDBUILDER();
+}
+
+Killed(severity, corpsetype)
+{
+	explode explodepoint type FALL;
+	sleep 1;
+	explode explodepoint type FALL;
+	sleep 1;
+	explode explodepoint type FALL;
+	emit-sfx DEADBUILDING_DUST_FX from explodepoint;
+	sleep 500;
+	emit-sfx DEADBUILDING_DUST_FX from explodepoint;
+	return(0);
+}

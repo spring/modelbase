@@ -1,0 +1,69 @@
+// Argh's Reactor Script
+
+// This script is released under the GPL, v. 2 or later, by Wolfe Games, 2007
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+
+piece supports, sphere, light01, light02;
+piece explodepoint;
+
+// SmokeUnit_WORLDBUILDER is a completely optional Include.  It *requires* STANDARD_COMMANDS_WORLDBUILDER.h
+// ...to be included (or the code) *BEFORE* you call it.
+// And SMOKEPIECE1 through SMOKEPIECE4 MUST BE DEFINED!
+// It doesn't matter if they all refer to the same part.
+#define SMOKEPIECE1 supports
+#define SMOKEPIECE2 sphere
+#define SMOKEPIECE3 supports
+#define SMOKEPIECE4 sphere
+#include "SmokeUnit_WORLDBUILDER.h"
+
+#define FAST_BLINK_BLUE 1024+1
+#define DEADBUILDING_DUST_FX 1024+2
+
+Blink()
+{
+	While(TRUE)
+	{
+		var Random;
+		Random = rand (3000, 4000);
+		sleep Random;
+		emit-sfx FAST_BLINK_BLUE from light01;
+		sleep 50;
+		emit-sfx FAST_BLINK_BLUE from light02;
+		sleep 500;
+		emit-sfx FAST_BLINK_BLUE from light01;
+		sleep 50;
+		emit-sfx FAST_BLINK_BLUE from light02;
+	}			
+}
+
+Create()
+{
+	turn explodepoint to x-axis <-90> now;
+	var RandomNumber, RandomTurn;
+
+	RandomTurn = rand(1, 65535);
+	turn supports to y-axis RandomTurn now;
+
+	RandomNumber = RAND (15,35);
+	start-script SmokeUnit_WORLDBUILDER();
+	start-script Blink();
+	spin sphere around y-axis speed <1>*RandomNumber;
+}
+
+Killed(severity, corpsetype)
+{
+	explode explodepoint type FALL;
+	sleep 1;
+	explode explodepoint type FALL;
+	sleep 1;
+	explode explodepoint type FALL;
+	emit-sfx DEADBUILDING_DUST_FX from explodepoint;
+	sleep 500;
+	emit-sfx DEADBUILDING_DUST_FX from explodepoint;
+	return(0);
+}

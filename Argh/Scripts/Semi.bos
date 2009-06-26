@@ -1,0 +1,26 @@
+//Semi Script
+
+// This script is hereby released under GPL v. 2 or later by Wolfe Games, 2008
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+
+piece body, cab, wheels;
+
+#define DEADBUILDING_DUST_FX 1024+1
+
+Create()
+{
+	sleep 30;
+}
+
+Killed(a,b)
+{
+	emit-sfx DEADBUILDING_DUST_FX from body;
+	explode cab type FALL;
+	explode wheels type SHATTER;
+	return (0);
+}

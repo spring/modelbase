@@ -1,0 +1,27 @@
+//TransformerBase Script
+
+// This script is hereby released under GPL v. 2 or later by Wolfe Games, 2008
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+
+piece base, greeble, fan_r, fan_l;
+
+#define DEADBUILDING_DUST_FX 1024+1
+
+Create()
+{
+	spin fan_l around y-axis speed <160>;
+	spin fan_r around y-axis speed <-160>;
+	sleep 30;
+}
+
+Killed(a,b)
+{
+	explode greeble type SHATTER;
+	emit-sfx DEADBUILDING_DUST_FX from base;
+	return (0);
+}

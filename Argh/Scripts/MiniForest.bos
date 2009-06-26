@@ -1,0 +1,808 @@
+// Argh's MiniForest Script
+
+// This script is hereby released under GPL v. 2 or later by Wolfe Games, 2007
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+
+piece base, reclaim_symbol;
+piece tree01, tree02, tree03, tree04, tree05, tree06, tree07, tree08, tree09, tree10;
+piece treeproxy01, treeproxy02, treeproxy03, treeproxy04, treeproxy05, treeproxy06, treeproxy07, treeproxy08, treeproxy09, treeproxy10;
+piece rock01, rock02, rock03, rock04, rock05, rock06, rock07, rock08, rock09, rock10, rock11, rock12, rock13, rock14;
+piece rockproxy01, rockproxy02, rockproxy03, rockproxy04, rockproxy05, rockproxy06, rockproxy07, rockproxy08, rockproxy09, rockproxy10, rockproxy11, rockproxy12, rockproxy13, rockproxy14;
+piece buds01, buds02, buds03, buds04;
+piece budsproxy01, budsproxy02, budsproxy03, budsproxy04;
+piece weedbig01, weedbig02, weedbig03, weedbig04, weedbig05, weedbig06, weedbig07;
+piece weedbigproxy01, weedbigproxy02, weedbigproxy03, weedbigproxy04, weedbigproxy05, weedbigproxy06, weedbigproxy07;
+piece grassbig01, grassbig02, grassbig03, grassbig04, grassbig05, grassbig06, grassbig07;
+piece grassbigproxy01, grassbigproxy02, grassbigproxy03, grassbigproxy04, grassbigproxy05, grassbigproxy06, grassbigproxy07;
+
+// SmokeUnit_WORLDBUILDER is a completely optional Include.  It *requires* STANDARD_COMMANDS_WORLDBUILDER.h
+// ...to be included (or the code) *BEFORE* you call it.
+// And SMOKEPIECE1 through SMOKEPIECE4 MUST BE DEFINED!
+// It doesn't matter if they all refer to the same part.
+#define SMOKEPIECE1 tree01
+#define SMOKEPIECE2 tree02
+#define SMOKEPIECE3 tree03
+#define SMOKEPIECE4 tree04
+#include "SmokeUnit_WORLDBUILDER.h"
+
+#define TREE_EXPLOSION_FX 1024+1
+#define RECLAIM_SYMBOL 1024+2
+
+lua_PutDownBlockers(arg) { return (0); }
+
+Placer()
+{
+var RandomTurn, RandomMoveZ, GroundHeight, RandomMoveX, RandomMoveNegZ, RandomMoveNegX;
+/////////////////////////////////////////////////////////////////////////////////////////////////// TREES
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////	
+	RandomTurn = rand(0,359);
+	turn treeproxy01 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree01 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree01)));
+	if (GroundHeight <= 0)
+	{
+		move tree01 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree01 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn treeproxy02 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree02 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree02)));
+	if (GroundHeight <= 0)
+	{
+		move tree02 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree02 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn treeproxy03 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree03 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree03)));
+	if (GroundHeight <= 0)
+	{
+		move tree03 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree03 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn treeproxy04 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree04 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree04)));
+	if (GroundHeight <= 0)
+	{
+		move tree04 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree04 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn treeproxy05 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree05 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree05)));
+	if (GroundHeight <= 0)
+	{
+		move tree05 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree05 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn treeproxy06 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree06 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree06)));
+	if (GroundHeight <= 0)
+	{
+		move tree06 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree06 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn treeproxy07 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree07 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree07)));
+	if (GroundHeight <= 0)
+	{
+		move tree07 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree07 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn treeproxy08 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree08 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree08)));
+	if (GroundHeight <= 0)
+	{
+		move tree08 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree08 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn treeproxy09 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree09 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree09)));
+	if (GroundHeight <= 0)
+	{
+		move tree09 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree09 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn treeproxy10 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move tree10 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(tree10)));
+	if (GroundHeight <= 0)
+	{
+		move tree10 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move tree10 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	call-script lua_PutDownBlockers(tree01);
+	call-script lua_PutDownBlockers(tree02);
+	call-script lua_PutDownBlockers(tree03);
+	call-script lua_PutDownBlockers(tree04);
+	call-script lua_PutDownBlockers(tree05);
+	call-script lua_PutDownBlockers(tree06);
+	call-script lua_PutDownBlockers(tree07);
+	call-script lua_PutDownBlockers(tree08);
+	call-script lua_PutDownBlockers(tree09);
+	call-script lua_PutDownBlockers(tree10);		
+/////////////////////////////////////////////////////////////////////////////////////////////////// TREES
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////	
+
+/////////////////////////////////////////////////////////////////////////////////////////////////// ROCKS
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////	
+	RandomTurn = rand(0,359);
+	turn rockproxy01 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock01 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock01)));
+	if (GroundHeight <= 0)
+	{
+		move rock01 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock01 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy02 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock02 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock02)));
+	if (GroundHeight <= 0)
+	{
+		move rock02 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock02 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy03 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock03 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock03)));
+	if (GroundHeight <= 0)
+	{
+		move rock03 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock03 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy04 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock04 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock04)));
+	if (GroundHeight <= 0)
+	{
+		move rock04 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock04 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy05 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock05 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock05)));
+	if (GroundHeight <= 0)
+	{
+		move rock05 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock05 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy06 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock06 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock06)));
+	if (GroundHeight <= 0)
+	{
+		move rock06 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock06 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy07 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock07 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock07)));
+	if (GroundHeight <= 0)
+	{
+		move rock07 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock07 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy08 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock08 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock08)));
+	if (GroundHeight <= 0)
+	{
+		move rock08 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock08 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy09 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock09 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock09)));
+	if (GroundHeight <= 0)
+	{
+		move rock09 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock09 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy10 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock10 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock10)));
+	if (GroundHeight <= 0)
+	{
+		move rock10 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock10 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy11 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock11 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock11)));
+	if (GroundHeight <= 0)
+	{
+		move rock11 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock11 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy12 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock12 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock12)));
+	if (GroundHeight <= 0)
+	{
+		move rock12 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock12 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy13 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock13 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock13)));
+	if (GroundHeight <= 0)
+	{
+		move rock13 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock13 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn rockproxy14 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move rock14 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(rock14)));
+	if (GroundHeight <= 0)
+	{
+		move rock14 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move rock14 to y-axis 0 - GroundHeight now;
+	}	
+/////////////////////////////////////////////////////////////////////////////////////////////////// ROCKS
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////							
+
+/////////////////////////////////////////////////////////////////////////////////////////////////// BUDS
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////	
+	RandomTurn = rand(0,359);
+	turn budsproxy01 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move buds01 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(buds01)));
+	if (GroundHeight <= 0)
+	{
+		move buds01 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move buds01 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn budsproxy02 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move buds02 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(buds02)));
+	if (GroundHeight <= 0)
+	{
+		move buds02 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move buds02 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn budsproxy03 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move buds03 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(buds03)));
+	if (GroundHeight <= 0)
+	{
+		move buds03 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move buds03 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn budsproxy04 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move buds04 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(buds04)));
+	if (GroundHeight <= 0)
+	{
+		move buds04 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move buds04 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+/////////////////////////////////////////////////////////////////////////////////////////////////// BUDS
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////			
+
+/////////////////////////////////////////////////////////////////////////////////////////////////// WEEDBIG
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////	
+	RandomTurn = rand(0,359);
+	turn weedbigproxy01 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move weedbig01 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(weedbig01)));
+	if (GroundHeight <= 0)
+	{
+		move weedbig01 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move weedbig01 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn weedbigproxy02 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move weedbig02 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(weedbig02)));
+	if (GroundHeight <= 0)
+	{
+		move weedbig02 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move weedbig02 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn weedbigproxy03 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move weedbig03 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(weedbig03)));
+	if (GroundHeight <= 0)
+	{
+		move weedbig03 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move weedbig03 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn weedbigproxy04 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move weedbig04 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(weedbig04)));
+	if (GroundHeight <= 0)
+	{
+		move weedbig04 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move weedbig04 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn weedbigproxy05 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move weedbig05 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(weedbig05)));
+	if (GroundHeight <= 0)
+	{
+		move weedbig05 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move weedbig05 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn weedbigproxy06 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move weedbig06 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(weedbig06)));
+	if (GroundHeight <= 0)
+	{
+		move weedbig06 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move weedbig06 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn weedbigproxy07 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move weedbig07 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(weedbig07)));
+	if (GroundHeight <= 0)
+	{
+		move weedbig07 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move weedbig07 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+/////////////////////////////////////////////////////////////////////////////////////////////////// WEEDBIG
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////	
+
+/////////////////////////////////////////////////////////////////////////////////////////////////// GRASSBIG
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////	
+	RandomTurn = rand(0,359);
+	turn grassbigproxy01 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move grassbig01 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(grassbig01)));
+	if (GroundHeight <= 0)
+	{
+		move grassbig01 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move grassbig01 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn grassbigproxy02 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move grassbig02 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(grassbig02)));
+	if (GroundHeight <= 0)
+	{
+		move grassbig02 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move grassbig02 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn grassbigproxy03 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move grassbig03 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(grassbig03)));
+	if (GroundHeight <= 0)
+	{
+		move grassbig03 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move grassbig03 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn grassbigproxy04 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move grassbig04 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(grassbig04)));
+	if (GroundHeight <= 0)
+	{
+		move grassbig04 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move grassbig04 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn grassbigproxy05 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move grassbig05 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(grassbig05)));
+	if (GroundHeight <= 0)
+	{
+		move grassbig05 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move grassbig05 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn grassbigproxy06 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move grassbig06 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(grassbig06)));
+	if (GroundHeight <= 0)
+	{
+		move grassbig06 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move grassbig06 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+	
+	RandomTurn = rand(0,359);
+	turn grassbigproxy07 to y-axis <1>*RandomTurn now;	
+	RandomMoveZ = rand(24,128);
+	move grassbig07 to z-axis [1]*(RandomMoveZ) now;	
+	GroundHeight = get GROUND_HEIGHT(get PIECE_XZ(base)) - (get GROUND_HEIGHT(get PIECE_XZ(grassbig07)));
+	if (GroundHeight <= 0)
+	{
+		move grassbig07 to y-axis GroundHeight now;	
+	}
+	if (GroundHeight > 0)
+	{
+		move grassbig07 to y-axis 0 - GroundHeight now;
+	}			
+	
+	sleep 1;
+/////////////////////////////////////////////////////////////////////////////////////////////////// GRASSBIG
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////	
+}
+
+ReclaimHere()
+{
+	while(TRUE)
+	{
+	emit-sfx RECLAIM_SYMBOL from reclaim_symbol;
+	sleep 3000;
+	}
+}	
+
+Create()
+{
+	start-script ReclaimHere();
+	start-script Placer();	
+	start-script SmokeUnit_WORLDBUILDER();
+}
+
+Killed(severity, corpsetype)
+{
+	emit-sfx TREE_EXPLOSION_FX from tree01;
+	emit-sfx TREE_EXPLOSION_FX from tree02;	
+	emit-sfx TREE_EXPLOSION_FX from tree03;	
+	emit-sfx TREE_EXPLOSION_FX from tree04;	
+	emit-sfx TREE_EXPLOSION_FX from tree05;	
+	emit-sfx TREE_EXPLOSION_FX from tree06;
+	emit-sfx TREE_EXPLOSION_FX from tree07;
+	emit-sfx TREE_EXPLOSION_FX from tree08;
+	emit-sfx TREE_EXPLOSION_FX from tree09;
+	emit-sfx TREE_EXPLOSION_FX from tree10;	
+
+	explode rock01 type FALL;
+	explode rock02 type FALL;
+	explode rock03 type FALL;
+	explode rock04 type FALL;
+	explode rock05 type FALL;
+	explode rock06 type FALL;
+	explode rock07 type FALL;
+	explode rock08 type FALL;
+	explode rock09 type FALL;
+	explode rock10 type FALL;
+	explode rock11 type FALL;
+	explode rock12 type FALL;
+	explode rock13 type FALL;
+	explode rock14 type FALL;	
+	turn tree01 to x-axis <-120> speed <60>;
+	turn tree02 to x-axis <-120> speed <60>;
+	turn tree03 to x-axis <-120> speed <60>;
+	turn tree04 to x-axis <-120> speed <60>;
+	turn tree05 to x-axis <-120> speed <60>;
+	turn tree06 to x-axis <-120> speed <60>;
+	turn tree07 to x-axis <-120> speed <60>;
+	turn tree08 to x-axis <-120> speed <60>;
+	turn tree09 to x-axis <-120> speed <60>;
+	turn tree10 to x-axis <-120> speed <60>;						
+	wait-for-turn tree01 around x-axis;		
+	return (0);
+}

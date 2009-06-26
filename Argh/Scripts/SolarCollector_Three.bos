@@ -1,0 +1,68 @@
+//Solar Collector Three Script
+
+// This script is hereby released under GPL v. 2 or later by Wolfe Games, 2008
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+//#include "BUILDING_INCLUDES.h"
+
+piece base, sphere;
+piece light1, light2, light3, light4, light5;
+
+#define DEADBUILDING_DUST_FX 1024+1
+#define FAST_BLINK_YELLOW 1024+2
+
+lights()
+{
+	var randomWait, randomBlip;
+	randomWait = rand(2000,6000);
+	randomBlip = rand(60,90);
+	while(TRUE)
+	{
+		emit-sfx FAST_BLINK_YELLOW from light1;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light2;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light3;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light4;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light5;
+		sleep 500;
+		emit-sfx FAST_BLINK_YELLOW from light2;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light4;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light5;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light1;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light3;		
+		sleep randomWait;		
+	}
+}
+
+Create()
+{
+	var RandomTurn;
+	RandomTurn = rand(0,360);
+	turn base to y-axis RandomTurn * <1> now;
+	RandomTurn = rand(5,20);
+	spin sphere around y-axis speed <1> * RandomTurn;
+	start-script lights();
+}
+
+Killed(a,b)
+{
+	emit-sfx DEADBUILDING_DUST_FX from base;
+	explode sphere type SHATTER;
+	explode light1 type FALL;	
+	explode light2 type FALL;
+	explode light3 type FALL;
+	explode light4 type FALL;
+	explode light5 type FALL;
+	return (0);
+}

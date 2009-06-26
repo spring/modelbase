@@ -1,0 +1,162 @@
+// Argh's WORLDBUILDER Ancient Metal Script
+
+// This script is copyright (C) Wolfe Games, 2007
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+
+piece base, emitter,centroid, top, bottom, left, right, back, front;
+
+// FX and Smoke Code.
+// SmokeUnit_WORLDBUILDER is a completely optional Include.  It *requires* STANDARD_COMMANDS_WORLDBUILDER.h
+// ExplosionIncludes_WORLDBUILDER is for explosion FX.  It *requires* SoundLibrary_WORLDBUILDER.h
+// This code (C) Wolfe Games.
+piece center, explode_point01, explode_point02, explode_point03, explode_point04, explode_point05, explode_point06, explode_point07, explode_point08;
+#define SMOKEPIECE1 explode_point01
+#define SMOKEPIECE2 explode_point02
+#define SMOKEPIECE3 explode_point03
+#define SMOKEPIECE4 explode_point04
+#include "SmokeUnit_WORLDBUILDER.h"
+///////////////////////////////////////FX RESERVED FOR EXPLOSIONS
+#define EXPLOSION1 1024+1
+#define EXPLOSION2 1024+2
+#define EXPLOSION3 1024+3
+#define EXPLOSION4 1024+4
+#define BIG_EXPLOSION1 1024+5
+#define BIG_EXPLOSION2 1024+6
+#define BIG_EXPLOSION3 1024+7
+#define BIG_EXPLOSION4 1024+8
+#define MinExplosions 6
+#define MaxExplosions 12
+#include "ExplosionIncludes_WORLDBUILDER.h"
+///////////////////////////////////////END RESERVED
+///////////////////////////////////////RESERVED
+#define ANCIENT_METAL_FX 1024+9
+
+#define SIG_ACTIVATE 2
+
+static-var RandomNumber, RandomNumber2, RandomTurn, Activated, COB_BLOCK;
+
+lua_CheckBlock(arg) { return (0); }
+lua_MakeVisible(arg) { return (0); }
+
+lua_testingComm(arg) { return (0); }
+
+MakeVis()
+{
+	sleep 100;
+	GET PRINT(1,1,1,1);
+	call-script lua_MakeVisible();
+}
+
+MetalProducing()
+{
+	var RandomSeed;
+	RandomSeed = rand(240, 300);
+	while (TRUE)
+	{
+		if(Activated)
+		{
+			emit-sfx ANCIENT_METAL_FX from emitter;
+			sleep RandomSeed * 10;
+		}else
+		{
+			sleep RandomSeed;
+		}	
+
+	}
+}
+
+Activate()
+{
+	signal SIG_ACTIVATE;
+	set-signal-mask SIG_ACTIVATE;
+	var randomturnX, randomturnZ;
+	randomturnX = RAND(5,20);
+	randomturnZ = RAND(5,20); 
+	move centroid to y-axis [40] speed [10];
+	wait-for-move centroid along y-axis;
+	move top to y-axis [7.5] speed [20];
+	move bottom to y-axis [-7.5] speed [20];
+	move front to z-axis [-7.5] speed [20];
+	move back to z-axis [7.5] speed [20];
+	move right to x-axis [-7.5] speed [20];
+	move left to x-axis [7.5] speed [20];
+	wait-for-move left along x-axis;
+	spin centroid around x-axis speed <1>*randomturnX accelerate <2>;
+	spin centroid around z-axis speed <1>*randomturnZ accelerate <2>;
+	Activated = 1;
+	set ACTIVATION to 100;
+}
+
+Deactivate()
+{
+}
+
+CobBlock()
+{
+	var RandomWait;
+	RandomWait = RAND(1000,2000);
+	
+	while(TRUE)
+	{
+		
+		if (COB_BLOCK == 1)
+		{
+	
+			call-script lua_CheckBlock();
+			COB_BLOCK = GET LUA4;
+			//get PRINT(get LUA1, get LUA2, get LUA3, get LUA4);
+			//get PRINT (COB_BLOCK);
+			Sleep RandomNumber;
+		}
+		if (COB_BLOCK == 0)
+		{
+			call-script Activate(); 
+			return(0);
+		}
+	}	 
+}
+
+
+Create()
+{
+	start-script lua_testingComm();
+	COB_BLOCK = 1;
+	spin centroid around y-axis speed <5>;
+
+	start-script CobBlock();
+	start-script SmokeUnit_WORLDBUILDER();
+	start-script MetalProducing();
+}
+
+Killed(severity, corpsetype)
+{
+	if (severity <= 50)
+	{
+		corpsetype = 1;
+		call-script Explosion();	
+		explode center type FALL;
+		sleep 1;
+		explode center type FALL;
+		sleep 1;
+		explode center type FALL;
+		sleep 1;		
+		return (corpsetype);
+	} else
+	{	
+		corpsetype = 2;
+		call-script Explosion();
+		explode center type FALL;
+		sleep 1;
+		explode center type FALL;
+		sleep 1;
+		explode center type FALL;
+		sleep 1;				
+		return (corpsetype);
+	}
+	return(0);
+}

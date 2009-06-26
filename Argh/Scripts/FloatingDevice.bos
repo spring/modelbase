@@ -1,0 +1,86 @@
+//Floating Device Script
+
+// This script is hereby released under GPL v. 2 or later by Wolfe Games, 2008
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+//#include "BUILDING_INCLUDES.h"
+
+//Explode Points
+piece center, explode_point01, explode_point02, explode_point03, explode_point04, explode_point05, explode_point06, explode_point07, explode_point08;
+
+piece base, turret;
+
+#define DEADBUILDING_DUST_FX 1024+1
+
+Bob()
+{
+	var randomX, randomZ, randomDepth, randomWay, randomWait;
+	while(TRUE)
+	{
+		randomX = rand(0,4);
+		randomZ = rand(0,4);
+		randomDepth = rand(0,5);
+		randomWait = rand(750, 1000);
+		
+		randomWay = rand(1,2);
+		if (randomWay <= 1)
+		{
+			randomWay = -1;
+		} else {
+			randomWay = 1;
+		}
+		turn base to x-axis randomX * <1> * randomWay speed randomX * <0.25>;
+		
+		randomWay = rand(1,2);
+		if (randomWay <= 1)
+		{
+			randomWay = -1;
+		} else {
+			randomWay = 1;
+		}
+		turn base to z-axis randomZ * <1> * randomWay speed randomZ * <0.25>;
+		
+		randomWay = rand(1,2);
+		if (randomWay <= 1)
+		{
+			randomWay = -1;
+		} else {
+			randomWay = 1;
+		}
+		move base to y-axis randomDepth * [1] * randomWay speed RandomDepth * [0.25];
+		sleep randomWait;
+	}
+}
+
+Create()
+{
+	var RandomTurn, RandomWay;
+	RandomTurn = rand(3,12);
+	RandomWay = rand(1,2);
+	if (RandomWay <= 1)
+	{
+		RandomWay = -1;
+	} else {
+		RandomWay = 1;
+	}
+	spin turret around y-axis speed RandomTurn * <1> * RandomWay;
+	start-script Bob();
+}
+
+Killed(a,b)
+{
+	emit-sfx DEADBUILDING_DUST_FX from base;
+	explode explode_point01 type FALL;	
+	explode explode_point02 type FALL;
+	explode explode_point03 type FALL;
+	explode explode_point04 type FALL;		
+	//emit-sfx DEADBUILDING_DUST_FX from explode_point01;
+	//emit-sfx DEADBUILDING_DUST_FX from explode_point02;
+	//emit-sfx DEADBUILDING_DUST_FX from explode_point03;
+	//emit-sfx DEADBUILDING_DUST_FX from explode_point04;
+	return (0);
+}
