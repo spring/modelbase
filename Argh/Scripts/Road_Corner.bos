@@ -1,0 +1,13 @@
+//Road Empty Script
+piece base;
+
+Create()
+{
+	hide base;
+	sleep 30;
+}
+
+Killed(a,b)
+{
+	return (0);
+}
