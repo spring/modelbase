@@ -1,0 +1,58 @@
+//Spaceliner Script
+
+// This script is hereby released under GPL v. 2 or later by Wolfe Games, 2008
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+//#include "BUILDING_INCLUDES.h"
+
+//Explode Points
+piece center, explode_point01, explode_point02, explode_point03, explode_point04, explode_point05, explode_point06, explode_point07, explode_point08;
+
+piece base, flame1, flame2, flame3, flame4, trail1, trail2;
+piece light1, light2, light3, light4;
+
+#define DEADBUILDING_DUST_FX 1024+1
+#define FAST_BLINK_YELLOW 1024+2
+
+lights()
+{
+	var randomWait, randomBlip;
+	randomWait = rand(2000,4000);
+	randomBlip = rand(30,90);
+	while(TRUE)
+	{
+		emit-sfx FAST_BLINK_YELLOW from light1;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light2;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light3;
+		sleep randomBlip;
+		emit-sfx FAST_BLINK_YELLOW from light4;
+		sleep randomWait;
+	}
+}
+
+Create()
+{
+	sleep 30;
+	start-script lights();
+	return 0;
+}
+
+Killed(a,b)
+{
+	emit-sfx DEADBUILDING_DUST_FX from base;
+	emit-sfx DEADBUILDING_DUST_FX from explode_point01;
+	emit-sfx DEADBUILDING_DUST_FX from explode_point02;
+	emit-sfx DEADBUILDING_DUST_FX from explode_point03;
+	emit-sfx DEADBUILDING_DUST_FX from explode_point04;
+	explode explode_point01 type FALL;	
+	explode explode_point02 type FALL;
+	explode explode_point03 type FALL;
+	explode explode_point04 type FALL;
+	return (0);
+}

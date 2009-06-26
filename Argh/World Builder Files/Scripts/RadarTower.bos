@@ -1,0 +1,42 @@
+//Radar Tower Script
+
+// This script is hereby released under GPL v. 2 or later by Wolfe Games, 2008
+// All contents were created by Wolfe Games.
+
+// This Include is absolutely VITAL.  
+// You must call it FIRST.  PERIOD.
+// Don't say I didn't warn you ;-)
+#include "STANDARD_COMMANDS_WORLDBUILDER.h"
+//#include "BUILDING_INCLUDES.h"
+
+//Explode Points
+piece center, explode_point01, explode_point02, explode_point03, explode_point04, explode_point05, explode_point06, explode_point07, explode_point08;
+
+piece base, head;
+
+#define DEADBUILDING_DUST_FX 1024+1
+
+
+Create()
+{	
+	var RandomTurn, RandomWay;
+	RandomTurn = rand(0,360);
+	turn base to y-axis RandomTurn * <1> now;
+	RandomTurn = rand(5,25);
+	RandomWay = rand(1,2);
+	if (RandomWay <= 1)
+	{
+		RandomWay = -1;
+	} else {
+		RandomWay = 1;
+	}
+	spin head around y-axis speed RandomTurn * <1> * RandomWay;
+	return (0);
+}
+
+Killed(a,b)
+{
+	emit-sfx DEADBUILDING_DUST_FX from base;
+	explode head type FALL;	
+	return (0);
+}
