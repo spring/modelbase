@@ -1,0 +1,258 @@
+//by Chris Mackey
+
+#include "constants.h"
+
+piece 
+//body
+base, axle, flap, low_head, rh_pist, lh_pist, turret, barrel, up_head, tank,
+//left leg
+l_leg, l_foot, l_sock1, l_sock2, l_knee, l_pist1, l_pist2, l_pist3, l_stab, l_toe, l_jet, 
+//right leg
+r_leg, r_foot, r_sock1, r_sock2, r_knee, r_pist1, r_pist2, r_pist3, r_stab, r_toe, r_jet,
+//left 'arm'
+l_fuelfeed, l_boxlid, l_can, l_barrel, l_box, 
+//right 'arm'
+r_fuelfeed, r_boxlid, r_can, r_barrel, r_box;
+
+static-var sp;
+
+#define sp 180
+#define lsp 5
+ 
+#define sigmove     2
+#define sigaim      4
+#define sigjump     8
+
+BeginJump()
+{
+	signal sigjump;
+	set-signal-mask sigjump;
+	//crouch and prepare to jump
+	turn l_leg to x-axis <0> speed <sp>;
+	turn l_foot to x-axis <0> speed <sp>;
+	turn r_leg to x-axis <0> speed <sp>;
+	turn r_foot to x-axis <0> speed <sp>;
+	move base to y-axis [-1] speed [5];
+	move l_pist to y-axis [1] speed [5];
+	move r_pist to y-axis [1] speed [5];
+	move base to z-axis [0.3] speed [3];
+	//spring off with lower legs
+	move base to y-axis [1.5] speed [10];
+	move l_pist to y-axis [-1.5] speed [10];
+	move r_pist to y-axis [-1.5] speed [10];
+	move base to z-axis [-1] speed [1];
+	//begin rocket boost
+	emit-sfx 1025 from l_jet;
+	emit-sfx 1025 from r_jet;
+	//small adjustments in flight
+	wait-for-move r_pist to y-axis;
+	move base to y-axis [0] speed [2];
+	move base to z-axis [-3] speed [2];
+	move l_pist to y-axis [0] speed [2];
+	move r_pist to y-axis [0] speed [2];
+	/*
+	turn l_jet to x-axis <30> speed <60>;
+	turn r_jet to x-axis <30> speed <60>;
+	wait-for-turn r_jet around x-axis;
+	turn l_jet to x-axis <-20> speed <15>;
+	turn r_jet to x-axis <-20> speed <15>;
+	wait-for-turn r_jet around x-axis;
+	*/
+	
+	//move legs to landing position
+	turn l_leg to x-axis <-40> speed <sp>/2;
+	turn r_leg to x-axis <-40> speed <sp>/2;
+	wait-for-move r_pist to y-axis;
+	move l_pist to y-axis [-1] speed [1];
+	move r_pist to y-axis [-1] speed [1];
+	
+	//sleep 100;
+}
+
+JumpSmoke()
+{			
+	while(1)
+	{
+		if (jumping)
+		{
+			//emit some flames from the feet
+			emit-sfx 1024 from l_jet;
+			emit-sfx 1024 from r_jet;
+		}
+		sleep 50;
+	}
+}
+
+EndJump()
+{
+	signal sigjump;
+	set-signal-mask sigjump;
+	//pistons absorb shock, recoil back up
+	turn low_head to x-axis <20> speed 2*<sp>;
+	move base to y-axis [-1] speed [7];
+	move l_pist to y-axis [1] speed [7];
+	move r_pist to y-axis [1] speed [7];
+	turn l_leg to x-axis <-15> speed <sp>;
+	turn l_foot to x-axis <15> speed <sp>;
+	turn r_leg to x-axis <-15> speed <sp>;
+	turn r_foot to x-axis <15> speed <sp>;
+	wait-for-turn low_head around x-axis;
+	turn low_head to x-axis <0> speed <sp>;
+	wait-for-move r_pist along y-axis;
+	move base to y-axis [0] speed [3];
+	move l_pist to y-axis [0] speed [3];
+	move r_pist to y-axis [0] speed [3];
+	sleep 100;
+	
+	//stumble forward
+	move base to z-axis [0] speed [5];
+	turn l_leg to x-axis <-20> speed <sp>;//left a tiny bit forward
+	turn l_foot to x-axis <20> speed <sp>;
+	wait-for-turn l_leg around x-axis;
+	//move l_pist to x-axis [0.5] speed [lsp];
+	turn r_leg to x-axis <-35> speed <sp>;//right a little forward
+	turn r_foot to x-axis <35> speed <sp>;
+	//flip cans up
+	turn l_can to x-axis <90> speed <90>;
+	turn r_can to x-axis <90> speed <90>;
+	sleep 100;
+}
+
+walk()
+{
+	turn l_leg to x-axis <-65> speed <sp>;
+	turn l_foot to x-axis <65> speed <sp>;
+	move l_pist to y-axis [-1.5] speed [lsp];
+	turn r_leg to x-axis <0> speed <sp>;
+	turn r_foot to x-axis <0> speed <sp>;
+	move r_pist to y-axis [0] speed [lsp];
+	while( TRUE )
+	{
+		if( TRUE )
+		{
+			turn l_leg to x-axis <-35> speed <sp>;
+			turn l_foot to x-axis <35> speed <sp>;
+			turn r_leg to x-axis <-20> speed <sp>;
+			turn r_foot to x-axis <20> speed <sp>;
+			move r_pist to x-axis [0.5] speed [lsp];
+			sleep 100;
+		}
+		if( TRUE )
+		{
+			turn l_leg to x-axis <0> speed <sp>;//left max back
+			turn l_foot to x-axis <0> speed <sp>;
+			turn r_leg to x-axis <-65> speed <sp>;//right max forward
+			turn r_foot to x-axis <65> speed <sp>;
+			move r_pist to x-axis [-1.5] speed [lsp];
+			sleep 100;
+		}
+		if( TRUE )
+		{
+			turn l_leg to x-axis <-20> speed <sp>;
+			turn l_foot to x-axis <20> speed <sp>;
+			move l_pist to x-axis [0.5] speed [lsp];
+			turn r_leg to x-axis <-35> speed <sp>;
+			turn r_foot to x-axis <35> speed <sp>;
+			sleep 100;
+		}
+		if( TRUE )
+		{
+			turn l_leg to x-axis <-65> speed <sp>;//left max forward
+			turn l_foot to x-axis <65> speed <sp>;
+			move l_pist to y-axis [-1.5] speed [lsp];
+			turn r_leg to x-axis <0> speed <sp>;//right max back
+			turn r_foot to x-axis <0> speed <sp>;
+			sleep 100;
+		}
+		//etc...
+		sleep 100;
+	}
+}
+
+StartMoving()
+{
+	signal sigmove;
+	set-signal-mask sigmove;
+	call-script walk();
+}
+
+StopMoving()
+{
+	signal sigmove;
+	set-signal-mask sigmove;
+	//move all the pieces to their original spots
+	
+	move base to y-axis [0] speed [lsp];
+	move l_pist to y-axis [0] speed [lsp];
+	move r_pist to y-axis [0] speed [lsp];
+	
+	turn l_leg to x-axis <-30> speed <sp>;
+	turn l_foot to x-axis <30> speed <sp>;
+	turn r_leg to x-axis <-30> speed <sp>;
+	turn r_foot to x-axis <30> speed <sp>;
+}
+
+//make smokeunit another file; cleaner than copypasta
+
+Create()
+{
+	start-script StopMoving();
+	start-script SmokeUnit();
+	start-script JumpSmoke();
+	turn l_leg to x-axis <-30> speed <sp>;
+	turn l_foot to x-axis <30> speed <sp>;
+	turn r_leg to x-axis <-30> speed <sp>;
+	turn r_foot to x-axis <30> speed <sp>;
+}
+
+
+AimFromPrimary(piecenum)
+{
+	piecenum = low_head;
+}
+
+QueryPrimary(piecenum)
+{
+	piecenum = turret;
+}
+
+AimPrimary(heading, pitch)
+{
+	signal sigaim;
+	set-signal-mask sigaim;
+	//turn head, open mouth/limbs
+	sleep 100;
+}
+
+FirePrimary()
+{
+	//emit some flames
+	sleep 100;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode l_foot type BITMAPONLY | BITMAP2;
+		explode l_leg type BITMAPONLY | BITMAP3;
+		explode r_foot type BITMAPONLY | BITMAP2;
+		explode r_leg type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		//yadda yadda
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		//yadda yadda
+		return (0);
+	}
+	corpsetype = 3;
+}
