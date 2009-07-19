@@ -11,8 +11,8 @@ activatescr()
 {
 	if( TRUE )
 	{
-		turn arm to x-axis <-90> speed <200>;
-		turn lathe to x-axis <-90> speed <200>;
+		turn arm to x-axis <-80> speed <200>;
+		turn lathe to x-axis <-80> speed <200>;
 		sleep 996;
 	}
 	sleep 6;
