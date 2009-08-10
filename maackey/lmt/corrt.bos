@@ -1,0 +1,239 @@
+//By Chris Mackey
+
+#include "constants.h"
+
+piece base, turret, lever, pod, l_poddoor, r_poddoor,
+//reloading bay
+door, doorpist, arm, hand,
+//missiles, missile doors, indicator lights
+m_1, m_2, m_3, d_1, d_2, d_3, lt_1g, lt_2g, lt_3g, lt_1r, lt_2r, lt_3r;
+
+static-var ammo, missile, missilespeed, mfront, mbelow;
+
+#define sigaim      2
+
+Create()
+{
+	//start-script SmokeUnit();
+	//initialize variables
+	ammo = 3;
+	missile = 1;
+	missilespeed = [100];
+	mfront = [3];
+	mbelow = [-6];
+	hide lt_1r;
+	hide lt_2r;
+	hide lt_3r;
+}
+
+Reload()
+{
+	if( ammo <= 2 )
+	{
+		turn turret to y-axis <0> speed <360>;
+		turn pod to x-axis <0> speed <360>;
+		
+		turn lever to x-axis <-90> speed <180>;
+		turn d_1 to x-axis <90> speed <180>;
+		turn d_2 to x-axis <90> speed <180>;
+		turn d_3 to x-axis <90> speed <180>;
+		turn door to x-axis <90> speed <270>;
+		turn doorpist to x-axis <-30> speed <180>;
+		wait-for-turn lever around x-axis;
+		
+	while( ammo <=2 )
+	{
+		set-signal-mask sigaim;
+		if( missile == m_1 )
+		{
+			show lt_1g;
+			hide lt_1r;
+			show m_1;
+			move arm to x-axis [0] speed [10];
+			wait-for-move arm along x-axis;
+			move m_1 to x-axis [0] speed [10];
+			move arm to y-axis [4] speed [10];
+			wait-for-move arm along y-axis;
+			missile = m_2;
+		}
+		if( missile == m_2 )
+		{
+			show lt_2g;
+			hide lt_2r;
+			show m_2;
+			move arm to x-axis [1] speed [10];
+			wait-for-move arm along x-axis;
+			move m_2 to x-axis [0] speed [10];
+			move arm to y-axis [4] speed [10];
+			wait-for-move arm along y-axis;
+			missile = m_3;
+		}
+		if( missile == m_3 )
+		{
+			show lt_3g;
+			hide lt_3r;
+			show m_3;
+			move arm to x-axis [2] speed [10];
+			wait-for-move arm along x-axis;
+			move m_3 to x-axis [0] speed [10];
+			move arm to y-axis [4] speed [10];
+			wait-for-move arm along y-axis;
+			missile = m_1;
+		}
+		
+		move arm to z-axis [-0.5] speed [20];
+		turn hand to x-axis <90> speed <180>;
+		wait-for-turn hand around x-axis;
+		move arm to y-axis [0] speed [15];
+		//sleep 500;
+		wait-for-move arm along y-axis;
+		move arm to z-axis [0] speed [5];
+		turn hand to x-axis <0> speed [5];
+		
+		sleep 11000;
+		ammo = (ammo + 1);
+	}
+		turn lever to x-axis <0> speed <180>;
+		turn d_1 to x-axis <0> speed <180>;
+		turn d_2 to x-axis <0> speed <180>;
+		turn d_3 to x-axis <0> speed <180>;
+		move arm to y-axis [0] speed [15];
+		turn door to x-axis <0> speed <90>;
+		turn doorpist to x-axis <0> speed <70>;
+		wait-for-turn lever around x-axis;
+	}
+}
+
+AimFromPrimary(piecenum)
+{
+	piecenum = turret;
+}
+
+QueryPrimary(piecenum)
+{
+	if( missile == 1 )
+	{
+		piecenum = m_1;
+	}
+	else if( missile == 2 )
+	{
+		piecenum = m_2;
+	}
+	else if( missile == 3 )
+	{
+		piecenum = m_3;
+	}
+}
+
+AimPrimary(heading, pitch)
+{
+	if( ammo >= 1 )
+	{
+		signal sigaim;
+		set-signal-mask sigaim;
+		turn turret to y-axis heading speed <450>; // left-right
+		turn pod to x-axis <0> - pitch speed <450>; //up-down
+		wait-for-turn turret around y-axis;
+		wait-for-turn turret around x-axis;
+		return (1);
+	}
+	else
+	{
+		sleep 100;
+	}
+}
+
+FirePrimary()
+{
+	if( missile == 1 )
+	{
+		move m_1 to x-axis [mfront] speed [missilespeed];
+		wait-for-move m_1 along x-axis;
+		hide m_1;
+		move m_1 to x-axis [mbelow] now;
+		
+		show lt_1r;
+		hide lt_1g;
+		emit-sfx 1025 from m_1;
+	}
+	else if( missile == 2 )
+	{
+		move m_2 to x-axis [mfront] speed [missilespeed];
+		wait-for-move m_2 along x-axis;
+		hide m_2;
+		move m_2 to x-axis [mbelow] now;
+		
+		show lt_2r;
+		hide lt_2g;
+		emit-sfx 1025 from m_2;
+	}
+	else if( missile == 3 )
+	{
+		move m_3 to x-axis [mfront] speed [missilespeed];
+		wait-for-move m_3 along x-axis;
+		hide m_3;
+		move m_3 to x-axis [mbelow] now;
+		
+		show lt_3r;
+		hide lt_3g;
+		emit-sfx 1025 from m_3;
+		missile = 1;
+	}
+	start-script Reload();
+	++missile;
+	--ammo;
+	
+}
+
+//remember to clean this up
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode lever type BITMAPONLY | BITMAP2;
+		explode door type BITMAPONLY | BITMAP3;
+		explode pod type BITMAPONLY | BITMAP4;
+		explode m_1 type BITMAPONLY | BITMAP5;
+		explode m_2 type BITMAPONLY | BITMAP1;
+		explode m_3 type BITMAPONLY | BITMAP2;
+		explode turret type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode lever type FALL | BITMAP2;
+		explode door type FALL | BITMAP3;
+		explode pod type SHATTER | BITMAP4;
+		explode m_1 type FALL | BITMAP5;
+		explode m_2 type FALL | BITMAP1;
+		explode m_3 type FALL | BITMAP2;
+		explode turret type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode base type BITMAPONLY | BITMAP1;
+		explode lever type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode door type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode pod type SHATTER | BITMAP4;
+		explode m_1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode m_2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode m_3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode turret type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	corpsetype = 3;
+	explode base type BITMAPONLY | BITMAP1;
+	explode lever type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode door type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode pod type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+	explode m_1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode m_2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode m_3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode turret type BITMAPONLY | BITMAP3;
+}

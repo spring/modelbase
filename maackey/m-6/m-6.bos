@@ -1,0 +1,138 @@
+//by Chris Mackey
+
+piece base, head, axle, podpist, pod,
+//missiles, exhaust points, back doors, pod doors
+m_1, m_2, m_3, ex_1, ex_2, ex_3, d_1, d_2, d_3, l_poddoor, r_poddoor,
+//left leg
+l_thigh, l_leg, l_pist, l_ankle, 
+//left foot
+l_foot, l_footie, l_toe, lf_toe, lb_toe,
+//right leg
+r_thigh, r_leg, r_pist, r_ankle, 
+//right foot
+r_foot, r_footie, r_toe, rf_toe, rb_toe;
+
+static-var /*sp, lsp, */missile;
+
+#define sigmove 	2
+#define sigaim 		4
+
+walk()
+{
+	sleep 200;
+}
+
+
+StartMoving()
+{
+	signal sigmove;
+	set-signal-mask sigmove;
+	call-script walk();
+	//move pieces to initial movement spots
+	
+	sleep 200;
+}
+
+StopMoving()
+{
+	signal sigmove;
+	set-signal-mask sigmove;
+	//move pieces to their original spots
+	
+	sleep 200;
+}
+
+Create()
+{
+	//initialize variables
+	missile = 1;
+	missilespeed = [850];
+	mfront = [10];
+	//pieces to start positions
+	turn ex_1 to x-axis <170> now;
+	turn ex_2 to x-axis <170> now;
+	turn ex_3 to x-axis <170> now;
+	turn axle to x-axis <-30> now;
+}
+
+RestoreAfterDelay()
+{
+	sleep 5000;
+	turn head to y-axis <0> speed <200>;
+	turn pod to x-axis <0> speed <200>;
+	turn axle to x-axis <-30> speed <60>;
+	move podpist to y-axis [0] speed [5];
+}
+
+AimFromWeapon3(piecenum)
+{
+	piecenum = pod;
+}
+
+QueryWeapon3(piecenum)
+{
+	//piecenum = "m_" + missile;
+	piecenum = m_1;
+}
+
+AimWeapon3( heading, pitch )
+{
+	signal sigaim;
+	set-signal-mask sigaim;
+	turn head to y-axis heading speed <450>; //left right
+	if( pitch <= 20 ) 
+	{
+		turn pod to x-axis <-20> - pitch speed <450>; //up down
+	}
+	else
+	{
+		turn pod to x-axis <0> - pitch speed <450>; //up down
+	}
+	turn axle to x-axis <-30> - pitch/4 speed <400>;
+	move podpist to y-axis [( pitch/9 )] speed [5];
+	wait-for-turn head around y-axis;
+	wait-for-turn pod around x-axis;
+	start-script RestoreAfterDelay();
+	return(1);
+}
+
+FireWeapon3( piecenum, pitch )
+{
+	if( missile == 1 )
+	{
+		move m_1 to z-axis mfront speed missilespeed;
+		emit-sfx 1024 from ex_1;
+		turn d_1 to x-axis <100> speed <1000>;
+		turn head to x-axis <5> speed <80>;
+		turn pod to x-axis <-25> - pitch speed <70>;
+		wait-for-move m_1 along z-axis;
+		turn pod to x-axis <0> speed <40>;
+		turn d_1 to x-axis <0> speed <100>;
+		missile = 2;
+		hide m_1;
+	}
+	else if( missile == 2 )
+	{
+		move m_2 to z-axis mfront speed missilespeed;
+		emit-sfx 1024 from ex_2;
+		turn d_2 to x-axis <100> speed <1000>;
+		turn head to x-axis <-5> speed <80>;
+		turn pod to x-axis <-15> - pitch speed <70>;
+		wait-for-move m_2 along z-axis;
+		turn pod to x-axis <0> speed <40>;
+		turn d_2 to x-axis <0> speed <100>;
+		missile = 3;
+	}
+	else if( missile == 3 )
+	{
+		move m_3 to z-axis mfront speed missilespeed;
+		emit-sfx 1024 from ex_3;
+		turn d_3 to x-axis <100> speed <1000>;
+		turn head to x-axis <-5> speed <80>;
+		turn pod to x-axis <-15> - pitch speed <70>;
+		missile = 1;
+		wait-for-move m_3 along z-axis;
+		turn pod to x-axis <0> speed <40>;
+		turn d_3 to x-axis <0> speed <100>;
+	}
+}
