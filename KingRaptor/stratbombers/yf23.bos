@@ -99,8 +99,7 @@ RequestState(requestedstate, currentstate)
 
 Create()
 {
-	turn flarel to y-axis <180.000000> now;
-	turn flarer to y-axis <180.000000> now;
+	turn turret to y-axis <180.000000> now;
 	Static_Var_1 = 3000;
 	call-script InitState();
 	start-script SmokeUnit();
@@ -124,7 +123,7 @@ Deactivate()
 RestoreAfterDelay()
 {
 	sleep Static_Var_1;
-	turn turret to y-axis <0> speed <90>;
+	turn turret to y-axis <180> speed <90>;
 	turn sleevel to x-axis <0> speed <50>;
 	turn sleever to x-axis <0> speed <50>;
 	return (0);
